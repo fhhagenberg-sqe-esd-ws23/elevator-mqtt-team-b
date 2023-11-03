@@ -2,19 +2,22 @@
 Group assignment SQElevator
 
 ## MQTT Topics
-Common topics:
-    building/numberOfElevators
-    building/numberOfFloors
-    building/floorHeight/feet
-    building/systemClockTick
+Common topics:  
+```
+    building/info/numberOfElevators
+    building/info/numberOfFloors
+    building/info/floorHeight/feet
+    building/info/systemClockTick
+```
 
-Elevator topics:
+Elevator topics:  
+```
     building/status/elevator/{id}/committedDirection
     building/status/elevator/{id}/acceleration/feetPerSqSec
     building/status/elevator/{id}/floorButton/{id}
     building/status/elevator/{id}/door
     building/status/elevator/{id}/floor
-    building/status/elevator/{id}/height/feet
+    building/status/elevator/{id}/position/feet
     building/status/elevator/{id}/speed/feetPerSec
     building/status/elevator/{id}/load/lbs
     building/info/elevator/{id}/floor/{id}/service
@@ -23,7 +26,10 @@ Elevator topics:
     building/control/elevator/{id}/committedDirection
     building/control/elevator/{id}/floor/{id}/service
     building/control/elevator/{id}/targetFloor
+```
 
-Floor topics:
+Floor topics:  
+```
     building/status/floor/{id}/button/up
     building/status/floor/{id}/button/down
+```
