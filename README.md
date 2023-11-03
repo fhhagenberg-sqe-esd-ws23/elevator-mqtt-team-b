@@ -20,11 +20,11 @@ Elevator topics:
     building/status/elevator/{id}/position/feet
     building/status/elevator/{id}/speed/feetPerSec
     building/status/elevator/{id}/load/lbs
-    building/info/elevator/{id}/floor/{id}/service
+    building/info/elevator/{id}/floorService/{id}
     building/info/elevator/{id}/targetFloor
     building/info/elevator/{id}/maxPassengers
     building/control/elevator/{id}/committedDirection
-    building/control/elevator/{id}/floor/{id}/service
+    building/control/elevator/{id}/floorService/{id}
     building/control/elevator/{id}/targetFloor
 ```
 

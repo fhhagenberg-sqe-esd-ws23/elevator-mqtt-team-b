@@ -6,13 +6,13 @@ public class BuildingInfo {
     private ElevatorInfo[] elevators;
     private FloorInfo[] floors;
     private final int floorHeight;
-    private long clockTick;
+    private long clockTickMs;
 
-    public BuildingInfo(int numElevators, int numFloors, int floorHeight, long clockTick) {
-        this.elevators = new ElevatorInfo[numElevators];
-        this.floors = new FloorInfo[numElevators];
+    public BuildingInfo(ElevatorInfo[] elevators, int numFloors, int floorHeight, long clockTickMs) {
+        this.elevators = elevators;
+        this.floors = new FloorInfo[numFloors];
         this.floorHeight = floorHeight;
-        this.clockTick = clockTick;
+        this.clockTickMs = clockTickMs;
     }
 
     public ElevatorInfo getElevator(int id) {
@@ -20,6 +20,13 @@ public class BuildingInfo {
             throw new InvalidArgError("Elevator with ID " + String.valueOf(id) + " does not exist.");
         }
         return elevators[id];
+    }
+
+    public void updateElevator(int id, ElevatorInfo elevator) {
+        if (id >= elevators.length) {
+            throw new InvalidArgError("Elevator with ID " + String.valueOf(id) + " does not exist.");
+        }
+        elevators[id] = elevator;
     }
 
     public FloorInfo getFloor(int number) {
@@ -42,6 +49,6 @@ public class BuildingInfo {
     }
 
     public long getClockTick() {
-        return clockTick;
+        return clockTickMs;
     }
 }
