@@ -283,6 +283,8 @@ public class ElevatorMqttAdapter extends TimerTask {
                 elevator.speed = elevatorIface.getElevatorSpeed(id);
                 elevator.load = elevatorIface.getElevatorWeight(id);
 
+                // TODO: add control topics
+
                 for (int num = 0; num < building.getNumberOfFloors(); num++) {
                     elevator.floorButtons[num] = elevatorIface.getElevatorButton(id, num);
                 }

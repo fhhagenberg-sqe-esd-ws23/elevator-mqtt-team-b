@@ -34,7 +34,6 @@ public class TargetFloorCb implements MqttActionListener {
             // update target floor and set changed flag
             targetFloor = ByteBuffer.wrap(msg.getPayload()).getInt();
             cbContext.buildingInfo.getElevator(elevatorId).targetFloor = targetFloor;
-            cbContext.buildingInfo.getElevator(elevatorId).hasChanged = true;
 
             cbContext.elevatorIface.setTarget(elevatorId, targetFloor);
 

@@ -46,7 +46,6 @@ public class FloorServicesCb implements MqttActionListener {
             // update floor service and set changed flag
             boolean floorService = Boolean.getBoolean(new String(msg.getPayload(), StandardCharsets.UTF_8));
             cbContext.buildingInfo.getElevator(elevatorId).floorsService[floorNum] = floorService;
-            cbContext.buildingInfo.getElevator(elevatorId).hasChanged = true;
 
             cbContext.elevatorIface.setServicesFloors(elevatorId, floorNum, floorService);
 

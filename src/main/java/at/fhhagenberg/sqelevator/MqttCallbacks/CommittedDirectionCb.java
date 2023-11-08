@@ -33,7 +33,6 @@ public class CommittedDirectionCb implements MqttActionListener {
             // update committed direction and set changed flag
             newDirection = ByteBuffer.wrap(msg.getPayload()).getInt();
             cbContext.buildingInfo.getElevator(elevatorId).committedDirection = newDirection;
-            cbContext.buildingInfo.getElevator(elevatorId).hasChanged = true;
 
             cbContext.elevatorIface.setCommittedDirection(elevatorId, newDirection);
 
