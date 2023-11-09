@@ -40,7 +40,7 @@ public class TargetFloorCb implements MqttActionListener {
         } catch (MqttException exc) {
             throw new MqttError("MQTT exception occurred in subscription callback: " + exc.toString());
         } catch (RemoteException exc) {
-            throw new ControlError("Unable to set new target floor " + String.valueOf(targetFloor) + " of elevator " + String.valueOf(elevatorId));
+            throw new ControlError("Unable to set new target floor " + String.valueOf(targetFloor) + " of elevator " + String.valueOf(elevatorId) + ": " + exc.getMessage());
         }
     }
 

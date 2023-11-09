@@ -41,7 +41,7 @@ public class FloorServicesCb implements MqttActionListener {
             // check range of floor number
             if (floorNum >= cbContext.buildingInfo.getElevator(elevatorId).floorsService.length){
                  throw new InvalidArgError("Floor number " + String.valueOf(floorNum) + " does not exist.");
-            }
+            }            
 
             // update floor service and set changed flag
             boolean floorService = Boolean.getBoolean(new String(msg.getPayload(), StandardCharsets.UTF_8));
@@ -52,7 +52,7 @@ public class FloorServicesCb implements MqttActionListener {
         } catch (MqttException exc) {
             throw new MqttError("MQTT exception occurred in subscription callback: " + exc.toString());
         } catch (RemoteException exc) {
-            throw new ControlError("Unable to set new floor service at floor " + String.valueOf(floorNum) + " of elevator " + String.valueOf(elevatorId));
+            throw new ControlError("Unable to set new floor service at floor " + String.valueOf(floorNum) + " of elevator " + String.valueOf(elevatorId) + ": " + exc.getMessage());
         }
     }
 

@@ -33,3 +33,11 @@ Floor topics:
     building/status/floor/{id}/button/up
     building/status/floor/{id}/button/down
 ```
+
+## Doc:
+
+```sh
+# generate Javadoc
+mvn javadoc:javadoc
+```
+The documentation can be found under `target/site/apidocs`

@@ -20,11 +20,15 @@ import at.fhhagenberg.sqelevator.MqttCallbacks.CommittedDirectionCb;
 import at.fhhagenberg.sqelevator.MqttCallbacks.FloorServicesCb;
 import at.fhhagenberg.sqelevator.MqttCallbacks.TargetFloorCb;
 
-import java.rmi.RemoteException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
+/**
+ * The ElevatorMqttAdapter provides the proprietary plc as MQTT interface <br>
+ * It periodically reads data from the PLC, saves them in an internal data struct
+ * and publishes them via MQTT. <br>
+ * It also subscribes to MQTT control topics and forwards the received data directly to the PLC.
+ */
 public class ElevatorMqttAdapter extends TimerTask {
     private MqttAsyncClient client;
     private MemoryPersistence persistence = new MemoryPersistence();
@@ -32,6 +36,7 @@ public class ElevatorMqttAdapter extends TimerTask {
     private int qos;
     private Boolean connected = false;
     private long timeoutMs;
+    private int controlUpdateInterval_ms;    
 
     private BuildingInfo building;
     private IElevator elevatorIface;
@@ -42,8 +47,17 @@ public class ElevatorMqttAdapter extends TimerTask {
     private Timer timer = new Timer();
 
 
-    public ElevatorMqttAdapter(BuildingInfo building, IElevator elevatorIface, String broker, String clientId, String subClientId, int qos, long timeoutMs) {
-        this.building = building;
+    /**     
+     * @param elevatorIface The PLC control interface
+     * @param broker host of broker
+     * @param clientId id of client
+     * @param subClientId sub client id
+     * @param qos mqtt quality of service
+     * @param timeoutMs mqtt timeout in ms
+     * @param controlUpdateInterval_ms Update interval in which data is polled from the PLC [ms]
+     */
+    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, String subClientId, int qos, long timeoutMs, int controlUpdateInterval_ms) {
+        this.building = new BuildingInfo();
         this.elevatorIface = elevatorIface;
 
         this.cbContext.buildingInfo = this.building;
@@ -51,23 +65,32 @@ public class ElevatorMqttAdapter extends TimerTask {
 
         this.qos = qos;
         this.timeoutMs = timeoutMs;
+        this.controlUpdateInterval_ms = controlUpdateInterval_ms;
         try {
             this.client = new MqttAsyncClient(broker, clientId, persistence);
         } catch (MqttException exc) {
             throw new MqttError(formatMqttException(exc));
         }
     }
+    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, String subClientId, int qos, long timeoutMs) {
+        this(elevatorIface, broker, clientId, subClientId, qos, timeoutMs, 100);
+    }
 
-    /** Disconnects the MQTT client. */
+    /** 
+     * Disconnects the MQTT client. 
+    */
     protected void finalize() {
         try {
-            client.close();
-        } catch (MqttException exc) {
-            System.err.println("While closing connection a " + formatMqttException(exc));
+            disconnectFromBroker();
+        } catch (MqttError exc) {
+            System.err.println(exc.getMessage());
         }
     }
 
-    /** Connects the MQTT client to the broker. */
+    /**
+     * Connects the MQTT client to the broker.
+     * @throws MqttError
+    */
     public void connectToBroker() {
         if (connected) {
             return;
@@ -79,30 +102,59 @@ public class ElevatorMqttAdapter extends TimerTask {
 
             IMqttToken token = client.connect(connOpts);
             token.waitForCompletion(timeoutMs);
+
+            connected = true;            
         } catch (MqttException exc) {
             throw new MqttError(formatMqttException(exc));
-        }
-        connected = true;
+        }        
     }
 
-    /** Connects to broker, subscribes to all control topics,  publishes all retained topics and runs the update loop. */
+    /**
+     * Disconnects from MQTT client
+     * @throws MqttError
+     */
+    public void disconnectFromBroker() {
+        if (!connected) {
+            return;
+        }
+
+        try {            
+            client.close();
+            connected = false;            
+        } catch (MqttException exc) {
+            throw new MqttError("While closing connection a " + formatMqttException(exc));
+        }        
+    }
+    
+
+    /**
+     * Connects to broker, subscribes to all control topics,  
+     * publishes all retained topics and runs the update loop. 
+     * @throws MqttError     
+     */
     public void run() {
         // do setup
         connectToBroker();
+        readStates();
         subscribeToController();
         publishRetainedTopics();
 
         // run update loop
         MqttUpdateTimerTask updateTimerTask = new MqttUpdateTimerTask(() -> { readStates(); publishState(); return null; });
-        timer.scheduleAtFixedRate(updateTimerTask, 0, building.getClockTick());
+        timer.scheduleAtFixedRate(updateTimerTask, 0, controlUpdateInterval_ms);
     }
 
-    /** Stops the publish loop. */
+    /**
+     * Stops the publish loop.
+    */
     public void stop() {
         timer.cancel();
     }
 
-    /** Subscribes to all control topics */
+    /**
+     * Subscribes to all control topics 
+     * @throws MqttError
+     */
     public void subscribeToController() {
         if (!client.isConnected()) {
             throw new MqttError("MQTT client must be connected before subscribing to topics");
@@ -131,7 +183,7 @@ public class ElevatorMqttAdapter extends TimerTask {
                         MqttTopics.controlElevatorTopic + String.valueOf(id) + "/floorService/" + String.valueOf(num),
                         qos, 
                         (Object)cbContext, 
-                        targetFloorCb
+                        floorServicesCb
                     );
                 }
             }
@@ -140,7 +192,10 @@ public class ElevatorMqttAdapter extends TimerTask {
         }
     }
 
-    /** Publishes all retained (static) topics */
+    /** 
+     * Publishes all retained (static) topics 
+     * @throws MqttError    
+    */
     public void publishRetainedTopics() {
         if (!client.isConnected()) {
             throw new MqttError("MQTT client must be connected before publishing messages");
@@ -183,6 +238,7 @@ public class ElevatorMqttAdapter extends TimerTask {
     /** 
      * Publishes updates on all non retained MQTT topics if it has changed.
      * This method should be called in a loop.
+     * @throws MqttError
      */
     public void publishState() {
         if (!client.isConnected()) {
@@ -255,12 +311,12 @@ public class ElevatorMqttAdapter extends TimerTask {
 
                 // status button 'up'
                 msg.setPayload(String.valueOf(floor.callUp).getBytes());
-                IMqttToken token = client.publish(MqttTopics.statusFloorTopic + String.valueOf(num) + "/button/up", msg);
+                IMqttToken token = client.publish(MqttTopics.statusFloorTopic + String.valueOf(floor.floorId) + "/button/up", msg);
                 token.waitForCompletion(timeoutMs);
 
                 // status button 'down'
                 msg.setPayload(String.valueOf(floor.callDown).getBytes());
-                token = client.publish(MqttTopics.statusFloorTopic + String.valueOf(num) + "/button/down", msg);
+                token = client.publish(MqttTopics.statusFloorTopic + String.valueOf(floor.floorId) + "/button/down", msg);
                 token.waitForCompletion(timeoutMs);
             }
 
@@ -269,41 +325,13 @@ public class ElevatorMqttAdapter extends TimerTask {
         }
     }
 
-    /** Read the current state of all elevators and floors in the building using the Elevator PLC */
+    /** 
+     * Read the current state of all elevators and floors in the
+     * building using the Elevator PLC.
+    * */
     public void readStates() {
-        int id = 0;
-        try{
-            for (id = 0; id < building.getNumberOfElevators(); id++) {
-                ElevatorInfo elevator = (ElevatorInfo)building.getElevator(id);
-
-                elevator.acceleration = elevatorIface.getElevatorAccel(id);
-                elevator.doorStatus = elevatorIface.getElevatorDoorStatus(id);
-                elevator.floor = elevatorIface.getElevatorFloor(id);
-                elevator.height = elevatorIface.getElevatorPosition(id);
-                elevator.speed = elevatorIface.getElevatorSpeed(id);
-                elevator.load = elevatorIface.getElevatorWeight(id);
-
-                // TODO: add control topics
-
-                for (int num = 0; num < building.getNumberOfFloors(); num++) {
-                    elevator.floorButtons[num] = elevatorIface.getElevatorButton(id, num);
-                }
-            }
-        } catch (RemoteException exc) {
-            throw new ControlError("Unable to read status from elevator " + String.valueOf(id));
-        }
-
-        try{
-            for (int num = 0; num < building.getNumberOfFloors(); num++) {
-                FloorInfo floor = building.getFloor(num);
-                floor.callUp = elevatorIface.getFloorButtonUp(num);
-                floor.callDown = elevatorIface.getFloorButtonDown(num);
-            }
-        } catch (RemoteException exc) {
-            throw new ControlError("Unable to read status from elevator " + String.valueOf(id));
-        }
+        building.populate(elevatorIface);        
     }
-
     private String formatMqttException(MqttException exc) {
         String msg = "MQTT error occurred:\n\treason " + exc.getReasonCode();
         msg += "\tmsg " + exc.getMessage();
@@ -311,5 +339,5 @@ public class ElevatorMqttAdapter extends TimerTask {
         msg += "\tcause " + exc.getCause();
         msg += "\texcep " + exc;
         return msg;
-    }
+    }    
 }
