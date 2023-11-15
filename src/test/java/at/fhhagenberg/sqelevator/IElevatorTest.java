@@ -1,24 +1,20 @@
 package at.fhhagenberg.sqelevator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.MockitoFramework;
 
 public class IElevatorTest {
 
     private IElevator elevator;
 
-    @Before
-    public void setUp() throws Exception {
-        // Create a mock object for the IElevator interface
-        elevator = mock(IElevator.class);
-    }
-
     @Test
     public void testGetCommittedDirection() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getCommittedDirection(0)).thenReturn(IElevator.ELEVATOR_DIRECTION_UP);
 
         int direction = elevator.getCommittedDirection(0);
@@ -28,6 +24,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetElevatorAccel() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getElevatorAccel(0)).thenReturn(10);
 
         int acceleration = elevator.getElevatorAccel(0);
@@ -37,6 +35,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetElevatorButton() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getElevatorButton(0, 1)).thenReturn(true);
 
         boolean buttonStatus = elevator.getElevatorButton(0, 1);
@@ -46,6 +46,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetElevatorDoorStatus() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getElevatorDoorStatus(0)).thenReturn(IElevator.ELEVATOR_DOORS_OPEN);
 
         int doorStatus = elevator.getElevatorDoorStatus(0);
@@ -55,6 +57,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetElevatorFloor() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getElevatorFloor(0)).thenReturn(2);
 
         int floor = elevator.getElevatorFloor(0);
@@ -64,6 +68,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetElevatorNum() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getElevatorNum()).thenReturn(3);
 
         int numElevators = elevator.getElevatorNum();
@@ -73,6 +79,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetElevatorPosition() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getElevatorPosition(0)).thenReturn(15);
 
         int position = elevator.getElevatorPosition(0);
@@ -82,6 +90,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetElevatorSpeed() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getElevatorSpeed(0)).thenReturn(5);
 
         int speed = elevator.getElevatorSpeed(0);
@@ -91,6 +101,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetElevatorWeight() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getElevatorWeight(0)).thenReturn(500);
 
         int weight = elevator.getElevatorWeight(0);
@@ -100,6 +112,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetElevatorCapacity() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getElevatorCapacity(0)).thenReturn(10);
 
         int capacity = elevator.getElevatorCapacity(0);
@@ -109,6 +123,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetFloorButtonDown() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getFloorButtonDown(1)).thenReturn(true);
 
         boolean buttonDown = elevator.getFloorButtonDown(1);
@@ -118,15 +134,19 @@ public class IElevatorTest {
 
     @Test
     public void testGetFloorButtonUp() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getFloorButtonUp(2)).thenReturn(false);
 
         boolean buttonUp = elevator.getFloorButtonUp(2);
 
-        assertFalse(buttonUp);
+        Assertions.assertFalse(buttonUp);
     }
 
     @Test
     public void testGetFloorHeight() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getFloorHeight()).thenReturn(12);
 
         int floorHeight = elevator.getFloorHeight();
@@ -136,6 +156,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetFloorNum() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getFloorNum()).thenReturn(5);
 
         int numFloors = elevator.getFloorNum();
@@ -145,6 +167,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetServicesFloors() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getServicesFloors(0, 3)).thenReturn(true);
 
         boolean servicesFloors = elevator.getServicesFloors(0, 3);
@@ -154,6 +178,8 @@ public class IElevatorTest {
 
     @Test
     public void testGetTarget() throws Exception {
+        elevator = mock(IElevator.class);
+
         when(elevator.getTarget(0)).thenReturn(4);
 
         int target = elevator.getTarget(0);
@@ -163,6 +189,8 @@ public class IElevatorTest {
 
     @Test
     public void testSetCommittedDirection() throws Exception {
+        elevator = mock(IElevator.class);
+
         doNothing().when(elevator).setCommittedDirection(0, IElevator.ELEVATOR_DIRECTION_DOWN);
 
         elevator.setCommittedDirection(0, IElevator.ELEVATOR_DIRECTION_DOWN);
@@ -172,6 +200,8 @@ public class IElevatorTest {
 
     @Test
     public void testSetServicesFloors() throws Exception {
+        elevator = mock(IElevator.class);
+
         doNothing().when(elevator).setServicesFloors(0, 2, true);
 
         elevator.setServicesFloors(0, 2, true);
@@ -181,6 +211,8 @@ public class IElevatorTest {
 
     @Test
     public void testSetTarget() throws Exception {
+        elevator = mock(IElevator.class);
+
         doNothing().when(elevator).setTarget(0, 3);
 
         elevator.setTarget(0, 3);
