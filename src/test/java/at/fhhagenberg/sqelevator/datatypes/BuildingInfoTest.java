@@ -1,10 +1,15 @@
 package at.fhhagenberg.sqelevator.datatypes;
 
 import at.fhhagenberg.sqelevator.IElevator;
-import org.junit.Before;
+import at.fhhagenberg.sqelevator.exceptions.ControlError;
+import at.fhhagenberg.sqelevator.exceptions.InvalidArgError;
+
 import org.junit.Test;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
+
+import java.rmi.RemoteException;
+
 import static org.junit.Assert.*;
 
 public class BuildingInfoTest {
@@ -12,25 +17,18 @@ public class BuildingInfoTest {
     @Mock
     private IElevator mockElevatorControl;
 
-    @Before
-    public void setUp() throws Exception {
-        mockElevatorControl = mock(IElevator.class);
-    }
-
     @Test
     public void testPopulate() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
         BuildingInfo buildingInfo = new BuildingInfo();
         
-        // Mock the behavior of IElevator methods
         when(mockElevatorControl.getFloorNum()).thenReturn(5);
         when(mockElevatorControl.getFloorHeight()).thenReturn(3);
         when(mockElevatorControl.getElevatorNum()).thenReturn(3);
         when(mockElevatorControl.getClockTick()).thenReturn(1000L);
 
-        // Call the populate method
         buildingInfo.populate(mockElevatorControl);
 
-        // Verify that the elevators and floors are populated
         assertEquals(3, buildingInfo.getNumberOfElevators());
         assertEquals(5, buildingInfo.getNumberOfFloors());
         assertEquals(3, buildingInfo.getFloorHeight());
@@ -39,6 +37,7 @@ public class BuildingInfoTest {
 
     @Test
     public void testGetElevator() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
         BuildingInfo buildingInfo = new BuildingInfo();
 
         when(mockElevatorControl.getElevatorNum()).thenReturn(3);
@@ -51,7 +50,39 @@ public class BuildingInfoTest {
     }
 
     @Test
+    public void testGetElevatorThrow() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
+        BuildingInfo buildingInfo = new BuildingInfo();
+        buildingInfo.populate(mockElevatorControl);
+        
+        InvalidArgError InvArgErr = assertThrows(InvalidArgError.class, () -> {
+            buildingInfo.getElevator(1);
+        });
+
+        assertEquals("Elevator with ID 1 does not exist.", InvArgErr.getMessage());
+    }
+    @Test
+    public void testGetElevatorExceedLengthThrow() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
+        BuildingInfo buildingInfo = new BuildingInfo();
+        when(mockElevatorControl.getElevatorNum()).thenReturn(3);
+        buildingInfo.populate(mockElevatorControl); 
+        
+        ElevatorInfo elevatorInfo = buildingInfo.getElevator(1);
+        assertNotNull(elevatorInfo);
+        assertEquals(1, elevatorInfo.elevatorId);
+        
+        
+        InvalidArgError InvArgErr = assertThrows(InvalidArgError.class, () -> {
+            buildingInfo.getElevator(4);
+        });
+
+        assertEquals("Elevator with ID 4 does not exist.", InvArgErr.getMessage());
+    }
+
+    @Test
     public void testGetFloor() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
         BuildingInfo buildingInfo = new BuildingInfo();
 
         when(mockElevatorControl.getFloorNum()).thenReturn(5);
@@ -63,9 +94,38 @@ public class BuildingInfoTest {
         assertEquals(1, floorInfo.floorId);
     }
 
+    @Test
+    public void testGetFloorThrow() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
+        BuildingInfo buildingInfo = new BuildingInfo();
+        buildingInfo.populate(mockElevatorControl);
+        
+        InvalidArgError InvArgErr = assertThrows(InvalidArgError.class, () -> {
+            buildingInfo.getFloor(1);
+        });
+
+        assertEquals("Floor number 1 does not exist.", InvArgErr.getMessage());
+    }
+
+     @Test
+    public void testGetFloorExceedLengthThrow() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
+        BuildingInfo buildingInfo = new BuildingInfo();
+        
+        when(mockElevatorControl.getFloorNum()).thenReturn(5);
+        buildingInfo.populate(mockElevatorControl);
+        
+        InvalidArgError InvArgErr = assertThrows(InvalidArgError.class, () -> {
+            buildingInfo.getFloor(6);
+        });
+
+        assertEquals("Floor number 6 does not exist.", InvArgErr.getMessage());
+    }
+
     
     @Test
     public void testGetNumberOfElevators() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
         BuildingInfo buildingInfo = new BuildingInfo();
 
         when(mockElevatorControl.getElevatorNum()).thenReturn(3);
@@ -77,6 +137,7 @@ public class BuildingInfoTest {
 
     @Test
     public void testGetNumberOfFloors() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
         BuildingInfo buildingInfo = new BuildingInfo();
 
         when(mockElevatorControl.getFloorNum()).thenReturn(5);
@@ -88,6 +149,7 @@ public class BuildingInfoTest {
 
     @Test
     public void testGetFloorHeight() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
         BuildingInfo buildingInfo = new BuildingInfo();
 
         when(mockElevatorControl.getFloorHeight()).thenReturn(3);
@@ -99,6 +161,7 @@ public class BuildingInfoTest {
 
     @Test
     public void testGetClockTick() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
         BuildingInfo buildingInfo = new BuildingInfo();
 
         buildingInfo.populate(mockElevatorControl);
@@ -110,5 +173,46 @@ public class BuildingInfoTest {
         buildingInfo.populate(mockElevatorControl);
 
         assertEquals(1000L, buildingInfo.getClockTick());
+    }
+
+    @Test
+    public void testPopulateElevators() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
+        BuildingInfo buildingInfo = new BuildingInfo();
+        buildingInfo.populate(mockElevatorControl);
+
+        when(mockElevatorControl.getFloorNum()).thenReturn(5);
+
+        buildingInfo.populate(mockElevatorControl);
+
+        for (int i = 0; i < buildingInfo.getNumberOfElevators(); i++) {
+            verify(buildingInfo.getElevator(i), times(1)).populate(mockElevatorControl);
+        }
+    }
+    @Test
+    public void testPopulateFloors() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
+        BuildingInfo buildingInfo = new BuildingInfo();
+        buildingInfo.populate(mockElevatorControl);
+
+        when(mockElevatorControl.getFloorNum()).thenReturn(5);
+
+        buildingInfo.populate(mockElevatorControl);
+
+        for (int i = 0; i < buildingInfo.getNumberOfElevators(); i++) {
+            verify(buildingInfo.getFloor(i), times(1)).populate(mockElevatorControl);
+        }
+    }
+
+        @Test
+    public void testPopulateWithRemoteException() throws Exception {
+        mockElevatorControl = mock(IElevator.class);
+        BuildingInfo buildingInfo = new BuildingInfo();
+
+        when(mockElevatorControl.getFloorNum()).thenThrow(new RemoteException("Mocked Remote Exception"));
+
+        ControlError err = assertThrows(ControlError.class, () -> buildingInfo.populate(mockElevatorControl));
+
+        assertEquals("Unable to read status from building: Mocked Remote Exception", err.getMessage());
     }
 }
