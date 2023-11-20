@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -17,19 +16,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.datatypes.BuildingInfo;
 import at.fhhagenberg.sqelevator.datatypes.ElevatorInfo;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 import at.fhhagenberg.sqelevator.exceptions.MqttError;
-
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+
+/**
+ * @see CommittedDirectionCb
+ */
 @ExtendWith(MockitoExtension.class)
 class CommittedDirectionCbTest {
 
@@ -40,6 +40,10 @@ class CommittedDirectionCbTest {
     @Mock ElevatorInfo mockElevatorInfo;
     @InjectMocks CommittedDirectionCb committedDirectionCb;
 
+    /**
+     * @throws Exception
+     * @see CommittedDirectionCb#onSuccess(IMqttToken)
+     */
     @Test 
     void onSuccess_shouldUpdateCommittedDirection() throws RemoteException, MqttException {
         MockitoAnnotations.initMocks(this);
@@ -66,6 +70,10 @@ class CommittedDirectionCbTest {
         assertEquals(Integer.valueOf(2), directionCaptor.getValue());
     }
 
+    /**
+     * @throws Exception
+     * @see CommittedDirectionCb#onSuccess(IMqttToken)
+     */
     @Test 
     void onSuccess_shouldThrowMqttError_whenElevatorIdNotFound() {
         String topic = "invalid_topic";
@@ -74,6 +82,10 @@ class CommittedDirectionCbTest {
         assertThrows(MqttError.class, () -> committedDirectionCb.onSuccess(mockMqttToken));
     }
 
+    /**
+     * @throws Exception
+     * @see CommittedDirectionCb#onSuccess(IMqttToken)
+     */
     @Test
     public void onSuccessMqttExceptionTest() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -88,6 +100,10 @@ class CommittedDirectionCbTest {
         assertEquals("MQTT exception occurred in subscription callback: Mocked MQTT Exception", err.getMessage());
     }
 
+    /**
+     * @throws Exception
+     * @see CommittedDirectionCb#onSuccess(IMqttToken)
+     */
     @Test
     public void onSuccessRemoteExceptionTest() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -113,6 +129,10 @@ class CommittedDirectionCbTest {
         assertEquals("Unable to set new committed direction '3' of elevator 1", err.getMessage());
     }
 
+    /**
+     * @throws Exception
+     * @see CommittedDirectionCb#onFailure(IMqttToken, Throwable)
+     */
     @Test
     public void onFailure() throws Exception {
         MockitoAnnotations.initMocks(this);

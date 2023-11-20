@@ -10,11 +10,18 @@ import org.junit.jupiter.api.Test;
 import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 
+/**
+ * @see ElevatorInfo
+ */
 public class ElevatorInfoTest {
 
     private ElevatorInfo elevatorInfo;
     private IElevator elevatorControl;
 
+    /**
+     * @throws Exception
+     * @see ElevatorInfo#populate(IElevator)
+     */
     @Test
     void testPopulate() throws Exception {
         elevatorControl = mock(IElevator.class);
@@ -49,6 +56,10 @@ public class ElevatorInfoTest {
         assertTrue(elevatorInfo.floorsService[0]);
     }
 
+    /**
+     * @throws Exception
+     * @see ElevatorInfo#populate(IElevator)
+     */
     @Test
     void testPopulateRemoteException() throws Exception {
         elevatorControl = mock(IElevator.class);

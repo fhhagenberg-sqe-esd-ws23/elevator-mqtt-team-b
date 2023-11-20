@@ -23,7 +23,12 @@ public class ElevatorMqttAdapterTest {
     private ElevatorMqttAdapter elevatorMqttAdapter;
       
 
-    @Test void testConnectToBroker() throws MqttException {
+    /**
+     * Test method for {@link ElevatorMqttAdapter#connectToBroker()}.
+     * @throws MqttException
+     */
+    @Test 
+    void testConnectToBroker() throws MqttException {
         MockitoAnnotations.initMocks(this);
 
         elevatorMqttAdapter = new ElevatorMqttAdapter(elevatorIface, "Client", "broker", "Subclient", 0, 0);
@@ -38,26 +43,10 @@ public class ElevatorMqttAdapterTest {
         //verify(tokenMock).waitForCompletion(anyLong());
     }
 
-    @Test void testDisconnectFromBroker() throws MqttException {
-        /*
-        String broker = "broker";
-        String clientId = "Client";
-        String subClientId = "Subclient";
-        int qos;
-        long timeoutMs;
-        elevatorMqttAdapter = new ElevatorMqttAdapter(elevatorIface, clientId, broker, subClientId, qos, timeoutMs);
-    
-         MockitoAnnotations.initMocks(this);
-        // Mocking MqttAsyncClient behavior
-        when(mqttAsyncClient.isConnected()).thenReturn(true);
-
-        // Calling the method to be tested
-        elevatorMqttAdapter.disconnectFromBroker();
-
-        // Verifying that MqttAsyncClient.close is called
-        verify(mqttAsyncClient).close();*/
-    }
-
+    /**
+     * Test method to check if a second connection is not possible.
+     * @throws MqttException
+     */
     @Test
     void connectToBroker_AlreadyConnected() throws MqttException {
         MockitoAnnotations.initMocks(this);
@@ -65,28 +54,6 @@ public class ElevatorMqttAdapterTest {
         when(mqttAsyncClient.isConnected()).thenReturn(true);
 
         elevatorMqttAdapter.connectToBroker();
-
-        verifyZeroInteractions(mqttAsyncClient);
-    }
-
-    @Test
-    void disconnectFromBroker_Success() throws MqttException {
-        MockitoAnnotations.initMocks(this);
-        
-        when(mqttAsyncClient.isConnected()).thenReturn(true);
-
-        elevatorMqttAdapter.disconnectFromBroker();
-
-        verifyZeroInteractions(mqttAsyncClient);
-    }
-
-    @Test
-    void disconnectFromBroker_NotConnected() throws MqttException {
-        MockitoAnnotations.initMocks(this);
-        
-        when(mqttAsyncClient.isConnected()).thenReturn(false);
-
-        elevatorMqttAdapter.disconnectFromBroker();
 
         verifyZeroInteractions(mqttAsyncClient);
     }

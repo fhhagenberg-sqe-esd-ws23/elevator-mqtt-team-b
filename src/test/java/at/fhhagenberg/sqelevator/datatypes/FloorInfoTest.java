@@ -12,12 +12,18 @@ import org.mockito.MockitoAnnotations;
 import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 
+/**
+ * @see FloorInfo
+ */
 public class FloorInfoTest {
 
     private FloorInfo floorInfo;
-    @Mock
-    private IElevator elevatorControl;
+    @Mock private IElevator elevatorControl;
 
+    /**
+     * @throws Exception
+     * @see FloorInfo#populate(IElevator)
+     */
     @Test
     void testPopulate() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -32,6 +38,10 @@ public class FloorInfoTest {
         assertFalse(floorInfo.callUp);
     }
 
+    /**
+     * @throws Exception
+     * @see FloorInfo#populate(IElevator)
+     */
     @Test
     void testPopulateRemoteException() throws Exception {
         MockitoAnnotations.initMocks(this);

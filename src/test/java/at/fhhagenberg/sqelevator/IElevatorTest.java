@@ -11,6 +11,14 @@ public class IElevatorTest {
 
     private IElevator elevator;
 
+    /*
+     * Test methods for IElevator interface
+     */
+
+     /**
+        * @throws Exception
+        * @see IElevator#getCommittedDirection(int)
+      */
     @Test
     public void testGetCommittedDirection() throws Exception {
         elevator = mock(IElevator.class);
@@ -22,6 +30,11 @@ public class IElevatorTest {
         assertEquals(IElevator.ELEVATOR_DIRECTION_UP, direction);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getElevatorAccel(int)
+     */
     @Test
     public void testGetElevatorAccel() throws Exception {
         elevator = mock(IElevator.class);
@@ -33,6 +46,11 @@ public class IElevatorTest {
         assertEquals(10, acceleration);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getElevatorButton(int, int)
+     */
     @Test
     public void testGetElevatorButton() throws Exception {
         elevator = mock(IElevator.class);
@@ -44,6 +62,11 @@ public class IElevatorTest {
         assertTrue(buttonStatus);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getElevatorDoorStatus(int)
+     */
     @Test
     public void testGetElevatorDoorStatus() throws Exception {
         elevator = mock(IElevator.class);
@@ -55,6 +78,11 @@ public class IElevatorTest {
         assertEquals(IElevator.ELEVATOR_DOORS_OPEN, doorStatus);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getElevatorFloor(int)
+     */
     @Test
     public void testGetElevatorFloor() throws Exception {
         elevator = mock(IElevator.class);
@@ -66,6 +94,11 @@ public class IElevatorTest {
         assertEquals(2, floor);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getElevatorNum()
+     */
     @Test
     public void testGetElevatorNum() throws Exception {
         elevator = mock(IElevator.class);
@@ -77,6 +110,11 @@ public class IElevatorTest {
         assertEquals(3, numElevators);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getElevatorPosition(int)
+     */
     @Test
     public void testGetElevatorPosition() throws Exception {
         elevator = mock(IElevator.class);
@@ -88,6 +126,11 @@ public class IElevatorTest {
         assertEquals(15, position);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getElevatorSpeed(int)
+     */
     @Test
     public void testGetElevatorSpeed() throws Exception {
         elevator = mock(IElevator.class);
@@ -99,6 +142,11 @@ public class IElevatorTest {
         assertEquals(5, speed);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getElevatorWeight(int)
+     */
     @Test
     public void testGetElevatorWeight() throws Exception {
         elevator = mock(IElevator.class);
@@ -110,6 +158,11 @@ public class IElevatorTest {
         assertEquals(500, weight);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getElevatorCapacity(int)
+     */
     @Test
     public void testGetElevatorCapacity() throws Exception {
         elevator = mock(IElevator.class);
@@ -121,6 +174,11 @@ public class IElevatorTest {
         assertEquals(10, capacity);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getFloorButtonDown(int)
+     */
     @Test
     public void testGetFloorButtonDown() throws Exception {
         elevator = mock(IElevator.class);
@@ -132,6 +190,11 @@ public class IElevatorTest {
         assertTrue(buttonDown);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getFloorButtonUp(int)
+     */
     @Test
     public void testGetFloorButtonUp() throws Exception {
         elevator = mock(IElevator.class);
@@ -143,6 +206,11 @@ public class IElevatorTest {
         Assertions.assertFalse(buttonUp);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getFloorHeight()
+     */
     @Test
     public void testGetFloorHeight() throws Exception {
         elevator = mock(IElevator.class);
@@ -154,6 +222,11 @@ public class IElevatorTest {
         assertEquals(12, floorHeight);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getFloorNum()
+     */
     @Test
     public void testGetFloorNum() throws Exception {
         elevator = mock(IElevator.class);
@@ -165,6 +238,11 @@ public class IElevatorTest {
         assertEquals(5, numFloors);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getServicesFloors(int, int)
+     */
     @Test
     public void testGetServicesFloors() throws Exception {
         elevator = mock(IElevator.class);
@@ -176,6 +254,11 @@ public class IElevatorTest {
         assertTrue(servicesFloors);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getTarget(int)
+     */
     @Test
     public void testGetTarget() throws Exception {
         elevator = mock(IElevator.class);
@@ -187,6 +270,11 @@ public class IElevatorTest {
         assertEquals(4, target);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#getTargetDirection(int)
+     */
     @Test
     public void testSetCommittedDirection() throws Exception {
         elevator = mock(IElevator.class);
@@ -198,6 +286,11 @@ public class IElevatorTest {
         verify(elevator, times(1)).setCommittedDirection(0, IElevator.ELEVATOR_DIRECTION_DOWN);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#setServicesFloors(int, int, boolean)
+     */
     @Test
     public void testSetServicesFloors() throws Exception {
         elevator = mock(IElevator.class);
@@ -209,6 +302,11 @@ public class IElevatorTest {
         verify(elevator, times(1)).setServicesFloors(0, 2, true);
     }
 
+    /**
+     * 
+     * @throws Exception
+     * @see IElevator#setTarget(int, int)
+     */
     @Test
     public void testSetTarget() throws Exception {
         elevator = mock(IElevator.class);

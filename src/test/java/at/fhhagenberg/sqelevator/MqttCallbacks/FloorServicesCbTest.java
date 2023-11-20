@@ -12,22 +12,19 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
-
-
 import org.mockito.ArgumentCaptor;
-
 import org.mockito.Mockito;
 
-
+/**
+ * @see FloorServicesCb
+ */
 public class FloorServicesCbTest {
 
     @Mock private IMqttToken mockMqttToken;
@@ -37,6 +34,10 @@ public class FloorServicesCbTest {
     @Mock private MqttError mqttErrorMock;
     @Mock private ControlError controlErrorMock;
 
+    /**
+     * @throws Exception
+     * @see FloorServicesCb#onSuccess(IMqttToken)
+     */
     @Test
     public void onSuccessTest() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -69,6 +70,10 @@ public class FloorServicesCbTest {
         assertEquals(false, floorServiceCaptor.getValue());
     }
 
+    /**
+     * @throws Exception
+     * @see FloorServicesCb#onSuccess(IMqttToken)
+     */
     @Test
     public void onSuccessElevatorIdNotFoundTest() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -85,6 +90,11 @@ public class FloorServicesCbTest {
 
         assertEquals("Could not find a elevator ID in topic: elevator/floor", err.getMessage());
     }
+
+    /**
+     * @throws Exception
+     * @see FloorServicesCb#onSuccess(IMqttToken)
+     */
     @Test
     public void onSuccessFloorNumberNotFoundTest() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -102,6 +112,10 @@ public class FloorServicesCbTest {
         assertEquals("Could not find a floor number in topic: elevator/1/floor", err.getMessage());
     }
 
+    /**
+     * @throws Exception
+     * @see FloorServicesCb#onSuccess(IMqttToken)
+     */
     @Test
     public void onSuccessMqttExceptionTest() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -119,6 +133,10 @@ public class FloorServicesCbTest {
         assertEquals("MQTT exception occurred in subscription callback: Mocked MQTT Exception", err.getMessage());
     }
 
+    /**
+     * @throws Exception
+     * @see FloorServicesCb#onSuccess(IMqttToken)
+     */
     @Test
     public void onSuccessRemoteExceptionTest() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -141,6 +159,11 @@ public class FloorServicesCbTest {
 
         assertEquals("Unable to set new floor service at floor 0 of elevator 1: Mocked Remote Exception", err.getMessage());
     }
+
+    /**
+     * @throws Exception
+     * @see FloorServicesCb#onSuccess(IMqttToken)
+     */
     @Test
     public void onSuccessInvalidArgErrorTest() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -161,6 +184,10 @@ public class FloorServicesCbTest {
         assertEquals("Floor number 1 does not exist.", err.getMessage());
     }
 
+    /**
+     * @throws Exception
+     * @see FloorServicesCb#onFailure(IMqttToken, Throwable)
+     */
     @Test
     public void onFailure() throws Exception {
         MockitoAnnotations.initMocks(this);
