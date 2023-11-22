@@ -56,6 +56,7 @@ public class ElevatorInfoTest {
         assertTrue(elevatorInfo.floorsService[0]);
     }
 
+    
     /**
      * @throws Exception
      * @see ElevatorInfo#populate(IElevator)

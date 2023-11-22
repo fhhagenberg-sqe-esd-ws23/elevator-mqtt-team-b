@@ -69,10 +69,10 @@
         </dependency>
 
         <!-- Uncomment to use HiveMQ MQTT Client -->
-        <!-- <dependency>
+        <dependency>
             <groupId>com.hivemq</groupId>
             <artifactId>hivemq-mqtt-client</artifactId>
-        </dependency> --> 
+        </dependency>  
     
         <dependency>
             <groupId>org.mockito</groupId>
@@ -97,6 +97,27 @@
             </plugin>
 
             <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.1</version>
             </plugin>
@@ -110,7 +131,7 @@
                     <failOnError>false</failOnError>
                 </configuration>
             </plugin>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
                 <version>1.15.1</version>
@@ -128,15 +149,15 @@
                         <goals>
                             <goal>mutationCoverage</goal>
                         </goals>
-                        <!--  fails the build if mutation score is less than 100%  -->
+                          fails the build if mutation score is less than 100%  -->
                         <!--
                                                 <configuration>
                                                     <mutationThreshold>100</mutationThreshold>
                                                 </configuration>
-                                                 -->
+                                                
                     </execution>
                 </executions>
-            </plugin>
+            </plugin> -->
         </plugins>
     </build>
 </project>
