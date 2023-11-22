@@ -6,25 +6,35 @@ import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 import at.fhhagenberg.sqelevator.exceptions.InvalidArgError;
 import at.fhhagenberg.sqelevator.exceptions.MqttError;
+
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import java.nio.ByteBuffer;
-import java.rmi.RemoteException;
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+
+import java.nio.ByteBuffer;
+import java.rmi.RemoteException;
+
+
+
 
 /**
  * @see FloorServicesCb
  */
+@ExtendWith(MockitoExtension.class)
 public class FloorServicesCbTest {
 
     @Mock private IMqttToken mockMqttToken;
@@ -78,10 +88,10 @@ public class FloorServicesCbTest {
     public void onSuccessElevatorIdNotFoundTest() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(mockMqttMessage.getPayload()).thenReturn("true".getBytes());
+        //when(mockMqttMessage.getPayload()).thenReturn("true".getBytes());
 
-        when(mockMqttToken.getMessage()).thenReturn(mockMqttMessage);
-        when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
+        //when(mockMqttToken.getMessage()).thenReturn(mockMqttMessage);
+        //when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/floor"});
 
         FloorServicesCb floorServicesCbSpy = spy(new FloorServicesCb());
@@ -99,10 +109,10 @@ public class FloorServicesCbTest {
     public void onSuccessFloorNumberNotFoundTest() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(mockMqttMessage.getPayload()).thenReturn("true".getBytes());
+        //when(mockMqttMessage.getPayload()).thenReturn("true".getBytes());
 
-        when(mockMqttToken.getMessage()).thenReturn(mockMqttMessage);
-        when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
+        //when(mockMqttToken.getMessage()).thenReturn(mockMqttMessage);
+        //when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/1/floor"});
 
         FloorServicesCb floorServicesCbSpy = spy(new FloorServicesCb());
@@ -122,7 +132,7 @@ public class FloorServicesCbTest {
 
         MqttException mockMqttException = Mockito.mock(MqttException.class);
         when(mockMqttException.toString()).thenReturn("Mocked MQTT Exception");
-        when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
+        //when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/1/floor/0"});
         doThrow(mockMqttException).when(mockMqttToken).getMessage();
 
@@ -169,7 +179,7 @@ public class FloorServicesCbTest {
         MockitoAnnotations.initMocks(this);
         mockCallbackContext.buildingInfo = mock(BuildingInfo.class);
         mockCallbackContext.elevatorIface = mock(IElevator.class);
-        when(mockMqttMessage.getPayload()).thenReturn("true".getBytes());
+        //when(mockMqttMessage.getPayload()).thenReturn("true".getBytes());
         when(mockMqttToken.getMessage()).thenReturn(mockMqttMessage);
         when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/1/floor/10"});

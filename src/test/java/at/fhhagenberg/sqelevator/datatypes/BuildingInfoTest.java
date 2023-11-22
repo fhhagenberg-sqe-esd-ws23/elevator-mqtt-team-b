@@ -3,7 +3,7 @@ package at.fhhagenberg.sqelevator.datatypes;
 import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 import at.fhhagenberg.sqelevator.exceptions.InvalidArgError;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import java.rmi.RemoteException;

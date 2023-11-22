@@ -15,6 +15,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+//import org.testcontainers.junit.jupiter.Testcontainers;
+//import org.testcontainers.junit.jupiter.Testcontainers;
+//import org.testcontainers.junit.jupiter.Container;
+//import org.testcontainers.containers.HiveMQContainer;
 
 //@Testcontainers
 public class ElevatorMqttAdapterTest {
@@ -24,6 +28,7 @@ public class ElevatorMqttAdapterTest {
     //private ElevatorMqttAdapter elevatorMqttAdapter;
     //private Mqtt3BlockingClient testClient;
     //@Container
+    //HiveMQContainer container = new HiveMQContainer(DockerImageName.parse("hivemq/hivemq-ce:latest")); // 1
 
     /**
      * Test method for {@link ElevatorMqttAdapter#connectToBroker()}.

@@ -4,11 +4,13 @@ import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.datatypes.BuildingInfo;
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.*;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
+@ExtendWith(MockitoExtension.class)
 public class TargetFloorCbTest {
 
     @Mock IMqttToken mockMqttToken;
@@ -71,11 +74,6 @@ public class TargetFloorCbTest {
     public void onSuccessElevatorIdNotFoundTest() throws Exception {
 
         MockitoAnnotations.initMocks(this);
-
-        when(mockMqttMessage.getPayload()).thenReturn("true".getBytes());
-
-        when(mockMqttToken.getMessage()).thenReturn(mockMqttMessage);
-        when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/target"});
 
         MqttError err = assertThrows(MqttError.class, () -> targetFloorCb.onSuccess(mockMqttToken));
@@ -93,7 +91,6 @@ public class TargetFloorCbTest {
 
         MqttException mockMqttException = Mockito.mock(MqttException.class);
         when(mockMqttException.toString()).thenReturn("Mocked MQTT Exception");
-        when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/1/target"});
         doThrow(mockMqttException).when(mockMqttToken).getMessage();
 
