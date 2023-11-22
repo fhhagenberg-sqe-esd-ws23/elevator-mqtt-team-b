@@ -38,10 +38,8 @@ public class ElevatorInfoTest {
         when(elevatorControl.getTarget(1)).thenReturn(4);
         when(elevatorControl.getElevatorButton(1, 0)).thenReturn(true);
         when(elevatorControl.getServicesFloors(1, 0)).thenReturn(true);
-
         
         elevatorInfo.populate(elevatorControl);
-
         
         assertEquals(10, elevatorInfo.maxPassengers);
         assertEquals(IElevator.ELEVATOR_DIRECTION_UP, elevatorInfo.committedDirection);
@@ -76,12 +74,9 @@ public class ElevatorInfoTest {
         when(elevatorControl.getTarget(1)).thenReturn(4);
         when(elevatorControl.getElevatorButton(1, 0)).thenReturn(true);
         when(elevatorControl.getServicesFloors(1, 0)).thenReturn(true);
-
         
         elevatorInfo.populate(elevatorControl);        
         elevatorInfo.populate(elevatorControl);
-
-
         
         assertEquals(10, elevatorInfo.maxPassengers);
         assertEquals(IElevator.ELEVATOR_DIRECTION_UP, elevatorInfo.committedDirection);

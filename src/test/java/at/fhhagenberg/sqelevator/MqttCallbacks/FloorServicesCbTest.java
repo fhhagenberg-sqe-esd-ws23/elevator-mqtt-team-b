@@ -29,8 +29,6 @@ import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
 
-
-
 /**
  * @see FloorServicesCb
  */
@@ -87,11 +85,6 @@ public class FloorServicesCbTest {
     @Test
     public void onSuccessElevatorIdNotFoundTest() throws Exception {
         MockitoAnnotations.initMocks(this);
-
-        //when(mockMqttMessage.getPayload()).thenReturn("true".getBytes());
-
-        //when(mockMqttToken.getMessage()).thenReturn(mockMqttMessage);
-        //when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/floor"});
 
         FloorServicesCb floorServicesCbSpy = spy(new FloorServicesCb());
@@ -109,10 +102,6 @@ public class FloorServicesCbTest {
     public void onSuccessFloorNumberNotFoundTest() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        //when(mockMqttMessage.getPayload()).thenReturn("true".getBytes());
-
-        //when(mockMqttToken.getMessage()).thenReturn(mockMqttMessage);
-        //when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/1/floor"});
 
         FloorServicesCb floorServicesCbSpy = spy(new FloorServicesCb());
@@ -132,7 +121,6 @@ public class FloorServicesCbTest {
 
         MqttException mockMqttException = Mockito.mock(MqttException.class);
         when(mockMqttException.toString()).thenReturn("Mocked MQTT Exception");
-        //when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/1/floor/0"});
         doThrow(mockMqttException).when(mockMqttToken).getMessage();
 
@@ -179,7 +167,6 @@ public class FloorServicesCbTest {
         MockitoAnnotations.initMocks(this);
         mockCallbackContext.buildingInfo = mock(BuildingInfo.class);
         mockCallbackContext.elevatorIface = mock(IElevator.class);
-        //when(mockMqttMessage.getPayload()).thenReturn("true".getBytes());
         when(mockMqttToken.getMessage()).thenReturn(mockMqttMessage);
         when(mockMqttToken.getUserContext()).thenReturn(mockCallbackContext);
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/1/floor/10"});
