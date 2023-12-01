@@ -268,7 +268,12 @@ public class ElevatorMqttAdapterTest {
         assertEquals("1000", payload); 
 
     }
-    
+
+    /**
+     * Test Publish Retained Topics, but only two at a time possible
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
     @Test
     void testPublishRetainedTopics() throws RemoteException, InterruptedException {
         elevatorMqttAdapter.connectToBroker();
