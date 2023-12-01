@@ -51,12 +51,11 @@ public class ElevatorMqttAdapter extends TimerTask {
      * @param elevatorIface The PLC control interface
      * @param broker host of broker
      * @param clientId id of client
-     * @param subClientId sub client id
      * @param qos mqtt quality of service
      * @param timeoutMs mqtt timeout in ms
      * @param controlUpdateInterval_ms Update interval in which data is polled from the PLC [ms]
      */
-    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, String subClientId, int qos, long timeoutMs, int controlUpdateInterval_ms) {
+    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, int qos, long timeoutMs, int controlUpdateInterval_ms) {
         this.building = new BuildingInfo();
         this.elevatorIface = elevatorIface;
 
@@ -72,8 +71,8 @@ public class ElevatorMqttAdapter extends TimerTask {
             throw new MqttError(formatMqttException(exc));
         }
     }
-    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, String subClientId, int qos, long timeoutMs) {
-        this(elevatorIface, broker, clientId, subClientId, qos, timeoutMs, 100);
+    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, int qos, long timeoutMs) {
+        this(elevatorIface, broker, clientId, qos, timeoutMs, 250);
     }
 
     /** 
