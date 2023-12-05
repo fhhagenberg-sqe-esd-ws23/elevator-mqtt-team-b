@@ -199,7 +199,7 @@ public class ElevatorMqttAdapter extends TimerTask {
         if (!client.isConnected()) {
             throw new MqttError("MQTT client must be connected before publishing messages");
         }
-        MqttMessage msg = new MqttMessage(null, qos, true, null);
+        MqttMessage msg = new MqttMessage(String.valueOf("").getBytes(), qos, true, null);
 
         try {
             // number of elevators
@@ -243,7 +243,7 @@ public class ElevatorMqttAdapter extends TimerTask {
         if (!client.isConnected()) {
             throw new MqttError("MQTT client must be connected before publishing messages");
         }
-        MqttMessage msg = new MqttMessage(null, qos, false, null);
+        MqttMessage msg = new MqttMessage(String.valueOf("").getBytes(), qos, false, null);
         try {
             // publish updates for all elevators
             for (int id = 0; id < building.getNumberOfElevators(); id++) {

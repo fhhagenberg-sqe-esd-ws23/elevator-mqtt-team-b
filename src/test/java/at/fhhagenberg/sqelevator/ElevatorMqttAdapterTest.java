@@ -32,6 +32,7 @@ import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck;
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish;
 
 import at.fhhagenberg.sqelevator.exceptions.ElevatorError;
+import at.fhhagenberg.sqelevator.exceptions.MqttError;
 
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -76,6 +77,13 @@ public class ElevatorMqttAdapterTest {
         MockitoAnnotations.initMocks(this);
         String Host = "tcp://" + container.getHost() + ":" + container.getMqttPort(); //mqtt.eclipseprojects.io:1883";
         elevatorMqttAdapter = new ElevatorMqttAdapter(elevatorIface, Host, "ElevatorTest", 2, 1000);
+    }
+
+    @Test
+    void testConstructor() {
+        assertThrows(IllegalArgumentException.class , ()->{
+            elevatorMqttAdapter = new ElevatorMqttAdapter(elevatorIface, "tcp://mqtttest 4711", "ElevatorTest", 2, 1000);
+        });
     }
      
     @Test 
@@ -365,6 +373,147 @@ public class ElevatorMqttAdapterTest {
         assertEquals("building/info/numberOfElevators", received.getTopic().toString());
         assertEquals("2", payload);  
     }
+
+    @Test
+    void testPublishRetainedTopicsErrorNotConnected(){
+        assertThrows(MqttError.class, ()->{
+            elevatorMqttAdapter.publishRetainedTopics();
+        });
+    }
+
+    @Test
+    void testPublishRetainedTopicsErrorWhilePublishing() throws RemoteException{
+        
+        when(elevatorIface.getElevatorNum()).thenReturn(2);
+        when(elevatorIface.getElevatorFloor(1)).thenReturn(1);
+        when(elevatorIface.getElevatorAccel(1)).thenReturn(15);
+        when(elevatorIface.getElevatorDoorStatus(1)).thenReturn(2);
+        when(elevatorIface.getElevatorPosition(1)).thenReturn(1);
+        when(elevatorIface.getElevatorSpeed(1)).thenReturn(5);
+        when(elevatorIface.getElevatorWeight(1)).thenReturn(10);
+        when(elevatorIface.getElevatorCapacity(1)).thenReturn(5);
+        when(elevatorIface.getElevatorButton(1, 1)).thenReturn(true);
+
+        when(elevatorIface.getFloorButtonDown(1)).thenReturn(true);
+        when(elevatorIface.getFloorButtonUp(1)).thenReturn(false);
+        when(elevatorIface.getFloorNum()).thenReturn(5);
+        when(elevatorIface.getFloorHeight()).thenReturn(3);
+        when(elevatorIface.getServicesFloors(1, 1)).thenReturn(true);
+
+        when(elevatorIface.getTarget(1)).thenReturn(5);
+        when(elevatorIface.getClockTick()).thenReturn(1000L);
+        when(elevatorIface.getCommittedDirection(1)).thenReturn(1);
+
+        //
+
+        assertThrows(NullPointerException.class, ()->{
+            
+            //testClient.subscribeWith().topicFilter("building/info/numberOfElevators").send();
+            elevatorMqttAdapter.connectToBroker();
+            //elevatorMqttAdapter.readStates();
+            //elevatorMqttAdapter.subscribeToController();
+            elevatorMqttAdapter.publishRetainedTopics();
+        });
+    }
+
+    /**
+     * Test if Subscribe to Controller works
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    @Test 
+    void testSubscribeToController() throws RemoteException, InterruptedException  {
+        elevatorMqttAdapter.connectToBroker();
+        when(elevatorIface.getElevatorNum()).thenReturn(2);
+        when(elevatorIface.getElevatorFloor(1)).thenReturn(1);
+        when(elevatorIface.getElevatorAccel(1)).thenReturn(15);
+        when(elevatorIface.getElevatorDoorStatus(1)).thenReturn(2);
+        when(elevatorIface.getElevatorPosition(1)).thenReturn(1);
+        when(elevatorIface.getElevatorSpeed(1)).thenReturn(5);
+        when(elevatorIface.getElevatorWeight(1)).thenReturn(10);
+        when(elevatorIface.getElevatorCapacity(1)).thenReturn(5);
+        when(elevatorIface.getElevatorButton(1, 1)).thenReturn(true);
+
+        when(elevatorIface.getFloorButtonDown(1)).thenReturn(true);
+        when(elevatorIface.getFloorButtonUp(1)).thenReturn(false);
+        when(elevatorIface.getFloorNum()).thenReturn(5);
+        when(elevatorIface.getFloorHeight()).thenReturn(3);
+        when(elevatorIface.getServicesFloors(1, 1)).thenReturn(true);
+
+        when(elevatorIface.getTarget(1)).thenReturn(5);
+        when(elevatorIface.getClockTick()).thenReturn(1000L);
+        when(elevatorIface.getCommittedDirection(1)).thenReturn(1);
+
+        elevatorMqttAdapter.readStates();
+        elevatorMqttAdapter.subscribeToController();
+        
+        // Mqtt5BlockingClient.Mqtt5Publishes publishes = testClient.publishes(MqttGlobalPublishFilter.ALL); 
+
+        // elevatorMqttAdapter.readStates();
+        // elevatorMqttAdapter.publishRetainedTopics();
+
+        // Mqtt5Publish received = publishes.receive();
+
+        // assertNotNull(received.getPayloadAsBytes());
+        // String payload = new String(received.getPayloadAsBytes(), StandardCharsets.UTF_8);
+        // assertEquals("building/info/numberOfElevators", received.getTopic().toString());
+        // assertEquals("2", payload); 
+
+    }
+
+    /**
+     * Test if Subscribe to Controller works
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    @Test 
+    void testRun() throws RemoteException, InterruptedException  {
+        
+        when(elevatorIface.getElevatorNum()).thenReturn(2);
+        when(elevatorIface.getElevatorFloor(1)).thenReturn(1);
+        when(elevatorIface.getElevatorAccel(1)).thenReturn(15);
+        when(elevatorIface.getElevatorDoorStatus(1)).thenReturn(2);
+        when(elevatorIface.getElevatorPosition(1)).thenReturn(1);
+        when(elevatorIface.getElevatorSpeed(1)).thenReturn(5);
+        when(elevatorIface.getElevatorWeight(1)).thenReturn(10);
+        when(elevatorIface.getElevatorCapacity(1)).thenReturn(5);
+        when(elevatorIface.getElevatorButton(1, 1)).thenReturn(true);
+
+        when(elevatorIface.getFloorButtonDown(1)).thenReturn(true);
+        when(elevatorIface.getFloorButtonUp(1)).thenReturn(false);
+        when(elevatorIface.getFloorNum()).thenReturn(5);
+        when(elevatorIface.getFloorHeight()).thenReturn(3);
+        when(elevatorIface.getServicesFloors(1, 1)).thenReturn(true);
+
+        when(elevatorIface.getTarget(1)).thenReturn(5);
+        when(elevatorIface.getClockTick()).thenReturn(1000L);
+        when(elevatorIface.getCommittedDirection(1)).thenReturn(1);
+
+        MqttError MqttError = assertThrows(MqttError.class, ()->{
+            elevatorMqttAdapter.run();
+        });
+        //assertEquals("MqttError", MqttError.getMessage());
+        // Mqtt5BlockingClient.Mqtt5Publishes publishes = testClient.publishes(MqttGlobalPublishFilter.ALL); 
+
+        // elevatorMqttAdapter.readStates();
+        // elevatorMqttAdapter.publishRetainedTopics();
+
+        // Mqtt5Publish received = publishes.receive();
+
+        // assertNotNull(received.getPayloadAsBytes());
+        // String payload = new String(received.getPayloadAsBytes(), StandardCharsets.UTF_8);
+        // assertEquals("building/info/numberOfElevators", received.getTopic().toString());
+        // assertEquals("2", payload); 
+
+    }
+
+    @Test
+    void testSubscribeToControllerAssert() throws RemoteException {
+        assertThrows(MqttError.class, ()->{
+            elevatorMqttAdapter.subscribeToController();
+        });
+    }
+
 
     /**
      * Test if the adapter can handle a second connection to the broker without crashing
