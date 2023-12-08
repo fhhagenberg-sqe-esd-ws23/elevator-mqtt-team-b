@@ -15,7 +15,6 @@ import at.fhhagenberg.sqelevator.datatypes.MqttTopics;
 
 import at.fhhagenberg.sqelevator.exceptions.*;
 import sqelevator.IElevator;
-import at.fhhagenberg.sqelevator.MqttUpdateTimerTask;
 import at.fhhagenberg.sqelevator.MqttCallbacks.CallbackContext;
 import at.fhhagenberg.sqelevator.MqttCallbacks.CommittedDirectionCb;
 import at.fhhagenberg.sqelevator.MqttCallbacks.FloorServicesCb;
@@ -23,6 +22,10 @@ import at.fhhagenberg.sqelevator.MqttCallbacks.TargetFloorCb;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
+import java.rmi.Naming;
+
 
 /**
  * The ElevatorMqttAdapter provides the proprietary plc as MQTT interface <br>
@@ -46,22 +49,23 @@ public class ElevatorMqttAdapter extends TimerTask {
     private MqttActionListener floorServicesCb = new FloorServicesCb();
     private MqttActionListener targetFloorCb = new TargetFloorCb();
     private Timer timer = new Timer();
+    private final long rmiConnectTimeoutS = 10;
 
 
-    /**     
-     * @param elevatorIface The PLC control interface
+    /**
      * @param broker host of broker
      * @param clientId id of client
      * @param qos mqtt quality of service
      * @param timeoutMs mqtt timeout in ms
      * @param controlUpdateInterval_ms Update interval in which data is polled from the PLC [ms]
      */
-    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, int qos, long timeoutMs, int controlUpdateInterval_ms) {
+    public ElevatorMqttAdapter(String broker, String clientId, int qos, long timeoutMs, int controlUpdateInterval_ms) {
         this.building = new BuildingInfo();
-        this.elevatorIface = elevatorIface;
 
         this.cbContext.buildingInfo = this.building;
         this.cbContext.elevatorIface = this.elevatorIface;
+        this.cbContext.adapter = this;
+
 
         this.qos = qos;
         this.timeoutMs = timeoutMs;
@@ -72,9 +76,22 @@ public class ElevatorMqttAdapter extends TimerTask {
             throw new MqttError(formatMqttException(exc));
         }
     }
-    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, int qos, long timeoutMs) {
-        this(elevatorIface, broker, clientId, qos, timeoutMs, 250);
+    public ElevatorMqttAdapter(String broker, String clientId, int qos, long timeoutMs) {
+        this(broker, clientId, qos, timeoutMs, 250);
     }
+
+    public static void main(String[] args) {
+
+		try {
+            String broker = "192.168.xxx.xxx";
+			ElevatorMqttAdapter adapter = new ElevatorMqttAdapter(broker, "elevatorAdapter", 2, 1000);
+            adapter.run();
+		} catch (ElevatorError exc) {
+			System.err.println("Caught ElevatorError while running elevator MQTT adapter: " + exc.toString());
+		} catch (Exception exc) {
+			System.err.println("Caught unhandled exception while running elevator MQTT adapter: " + exc.toString());
+		}
+	}
 
     /** 
      * Disconnects the MQTT client. 
@@ -125,8 +142,25 @@ public class ElevatorMqttAdapter extends TimerTask {
             throw new MqttError("While closing connection a " + formatMqttException(exc));
         }        
     }
-    
 
+    /**
+     * Connects to the elevator control via RMI.
+     */
+    public void connectToElevator() {
+        try {
+            this.elevatorIface = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
+        } catch(Exception e) {
+            try {
+                System.out.println("Failed to connect to elevator via RMI, retrying in " + String.valueOf(this.rmiConnectTimeoutS) + " seconds");
+                TimeUnit.SECONDS.sleep(this.rmiConnectTimeoutS);
+            } catch(InterruptedException exc) {
+                throw new RmiError("While waiting for reconnect to RMI: " + exc.toString());
+            }
+            // try again
+            connectToElevator();
+        }
+    }
+    
     /**
      * Connects to broker, subscribes to all control topics,  
      * publishes all retained topics and runs the update loop. 
@@ -134,6 +168,7 @@ public class ElevatorMqttAdapter extends TimerTask {
      */
     public void run() {
         // do setup
+        connectToElevator();
         connectToBroker();
         readStates();
         subscribeToController();
@@ -141,7 +176,7 @@ public class ElevatorMqttAdapter extends TimerTask {
 
         // run update loop
         MqttUpdateTimerTask updateTimerTask = new MqttUpdateTimerTask(() -> { readStates(); publishState(); return null; });
-        timer.scheduleAtFixedRate(updateTimerTask, 0, controlUpdateInterval_ms);
+        timer.schedule(updateTimerTask, 0, controlUpdateInterval_ms);
     }
 
     /**
@@ -330,8 +365,15 @@ public class ElevatorMqttAdapter extends TimerTask {
      * building using the Elevator PLC.
     * */
     public void readStates() {
-        building.populate(elevatorIface);        
-    }
+        try {
+            building.populate(elevatorIface);        
+        } catch(ControlError exc) {
+            System.out.println("Lost RMI connection to elevator control, trying to reconnect...");
+            connectToElevator();
+            // read states again
+            readStates();
+        }            
+}
     private String formatMqttException(MqttException exc) {
         String msg = "MQTT error occurred:\n\treason " + exc.getReasonCode();
         msg += "\tmsg " + exc.getMessage();

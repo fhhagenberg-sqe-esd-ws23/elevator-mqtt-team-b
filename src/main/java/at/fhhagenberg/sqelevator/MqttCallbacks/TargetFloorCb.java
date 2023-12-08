@@ -19,6 +19,7 @@ public class TargetFloorCb implements MqttActionListener {
     public void onSuccess(IMqttToken asyncActionToken) {
         int elevatorId = -1;
         int targetFloor = -1;
+        CallbackContext cbContext = new CallbackContext();
         try {
             // get elevator ID from topic
             String topic = asyncActionToken.getTopics()[0];
@@ -29,7 +30,7 @@ public class TargetFloorCb implements MqttActionListener {
             elevatorId = Integer.valueOf(matcher.group());
 
             MqttMessage msg = asyncActionToken.getMessage();
-            CallbackContext cbContext = (CallbackContext)asyncActionToken.getUserContext();
+            cbContext = (CallbackContext)asyncActionToken.getUserContext();
 
             // update target floor and set changed flag
             targetFloor = ByteBuffer.wrap(msg.getPayload()).getInt();
@@ -40,7 +41,15 @@ public class TargetFloorCb implements MqttActionListener {
         } catch (MqttException exc) {
             throw new MqttError("MQTT exception occurred in subscription callback: " + exc.toString());
         } catch (RemoteException exc) {
-            throw new ControlError("Unable to set new target floor " + String.valueOf(targetFloor) + " of elevator " + String.valueOf(elevatorId) + ": " + exc.getMessage());
+            System.out.println("Lost RMI connection to elevator, trying to reconnect...");
+            if (cbContext.adapter == null) {
+                System.out.println("Unable to reconnect, callback context was not initialized yet");
+                throw new ControlError("Lost RMI connection to elevator, unable to reconnect, callback context was not initialized yet");
+            }
+            // try to reconnect
+            cbContext.adapter.connectToElevator();
+            // handle MQTT request again
+            this.onSuccess(asyncActionToken);
         }
     }
 
