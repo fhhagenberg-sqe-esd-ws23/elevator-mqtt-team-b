@@ -2,8 +2,8 @@ package at.fhhagenberg.sqelevator.datatypes;
 
 import java.rmi.RemoteException;
 
-import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
+import sqelevator.IElevator;
 
 public class FloorInfo {    
     /** The floor number*/

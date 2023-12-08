@@ -7,8 +7,8 @@ import java.rmi.RemoteException;
 
 import org.junit.jupiter.api.Test;
 
-import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
+import sqelevator.IElevator;
 
 /**
  * @see ElevatorInfo

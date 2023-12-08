@@ -1,7 +1,7 @@
 package at.fhhagenberg.sqelevator.MqttCallbacks;
 
-import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.datatypes.BuildingInfo;
+import sqelevator.IElevator;
 
 public class CallbackContext {
     public BuildingInfo buildingInfo;

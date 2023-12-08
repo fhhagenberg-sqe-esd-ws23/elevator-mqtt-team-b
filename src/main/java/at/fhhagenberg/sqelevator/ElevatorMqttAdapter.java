@@ -14,6 +14,7 @@ import at.fhhagenberg.sqelevator.datatypes.FloorInfo;
 import at.fhhagenberg.sqelevator.datatypes.MqttTopics;
 
 import at.fhhagenberg.sqelevator.exceptions.*;
+import sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.MqttUpdateTimerTask;
 import at.fhhagenberg.sqelevator.MqttCallbacks.CallbackContext;
 import at.fhhagenberg.sqelevator.MqttCallbacks.CommittedDirectionCb;

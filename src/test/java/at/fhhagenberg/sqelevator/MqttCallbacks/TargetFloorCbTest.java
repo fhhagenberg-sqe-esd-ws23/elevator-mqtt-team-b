@@ -12,11 +12,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.datatypes.BuildingInfo;
 import at.fhhagenberg.sqelevator.datatypes.ElevatorInfo;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 import at.fhhagenberg.sqelevator.exceptions.MqttError;
+import sqelevator.IElevator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

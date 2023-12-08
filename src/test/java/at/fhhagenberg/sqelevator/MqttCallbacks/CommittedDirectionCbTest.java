@@ -16,11 +16,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import at.fhhagenberg.sqelevator.IElevator;
+
 import at.fhhagenberg.sqelevator.datatypes.BuildingInfo;
 import at.fhhagenberg.sqelevator.datatypes.ElevatorInfo;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 import at.fhhagenberg.sqelevator.exceptions.MqttError;
+import sqelevator.IElevator;
+
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import static org.junit.Assert.assertEquals;
