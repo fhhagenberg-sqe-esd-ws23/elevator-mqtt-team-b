@@ -113,10 +113,10 @@ public class TargetFloorCbTest {
         when(mockMqttToken.getTopics()).thenReturn(new String[]{"elevator/1/target"});
 
         RemoteException mockRemoteException = mock(RemoteException.class);
-        when(mockRemoteException.getMessage()).thenReturn("Mocked Remote Exception");
 
         mockCallbackContext.buildingInfo = mock(BuildingInfo.class);
         mockCallbackContext.elevatorIface = mock(IElevator.class);
+        mockCallbackContext.adapter = null;
         
         when(mockCallbackContext.buildingInfo.getElevator(anyInt())).thenReturn(mockElevatorInfo);
         
@@ -124,7 +124,7 @@ public class TargetFloorCbTest {
 
         ControlError err = assertThrows(ControlError.class, () -> targetFloorCb.onSuccess(mockMqttToken));
 
-        assertEquals("Unable to set new target floor 3 of elevator 1: Mocked Remote Exception", err.getMessage());
+        assertEquals("Lost RMI connection to elevator, unable to reconnect, callback context was not initialized yet", err.getMessage());
     }
 
     /**

@@ -117,10 +117,10 @@ class CommittedDirectionCbTest {
 
 
         RemoteException mockRemoteException = mock(RemoteException.class);
-        //when(mockRemoteException.getMessage()).thenReturn("Mocked Remote Exception");
 
         mockCallbackContext.buildingInfo = mock(BuildingInfo.class);
         mockCallbackContext.elevatorIface = mock(IElevator.class);
+        mockCallbackContext.adapter = null;
         
         when(mockCallbackContext.buildingInfo.getElevator(anyInt())).thenReturn(mockElevatorInfo);
         
@@ -128,7 +128,7 @@ class CommittedDirectionCbTest {
 
         ControlError err = assertThrows(ControlError.class, () -> committedDirectionCb.onSuccess(mockMqttToken));
 
-        assertEquals("Unable to set new committed direction '3' of elevator 1", err.getMessage());
+        assertEquals("Lost RMI connection to elevator, unable to reconnect, callback context was not initialized yet", err.getMessage());
     }
 
     /**

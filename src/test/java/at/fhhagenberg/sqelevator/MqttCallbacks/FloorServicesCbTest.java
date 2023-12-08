@@ -140,6 +140,7 @@ public class FloorServicesCbTest {
         MockitoAnnotations.initMocks(this);
         mockCallbackContext.buildingInfo = mock(BuildingInfo.class);
         mockCallbackContext.elevatorIface = mock(IElevator.class);
+        mockCallbackContext.adapter = null;
 
         mockElevatorInfo.floorsService = new Boolean[5];
         when(mockMqttMessage.getPayload()).thenReturn(ByteBuffer.allocate(4).putInt(3).array());
@@ -149,13 +150,12 @@ public class FloorServicesCbTest {
         when(mockCallbackContext.buildingInfo.getElevator(anyInt())).thenReturn(mockElevatorInfo);
         
         RemoteException mockRemoteException = mock(RemoteException.class);
-        when(mockRemoteException.getMessage()).thenReturn("Mocked Remote Exception");
         doThrow(mockRemoteException).when(mockCallbackContext.elevatorIface).setServicesFloors(anyInt(), anyInt() ,anyBoolean()); 
 
         FloorServicesCb floorServicesCbSpy = spy(new FloorServicesCb());
         ControlError err = assertThrows(ControlError.class, () -> floorServicesCbSpy.onSuccess(mockMqttToken));
 
-        assertEquals("Unable to set new floor service at floor 0 of elevator 1: Mocked Remote Exception", err.getMessage());
+        assertEquals("Lost RMI connection to elevator, unable to reconnect, callback context was not initialized yet", err.getMessage());
     }
 
     /**
