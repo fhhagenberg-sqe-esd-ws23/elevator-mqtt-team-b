@@ -1,4 +1,4 @@
-package at.fhhagenberg.sqelevator.datatypes;
+package at.fhhagenberg.sqelevator.Adapter.datatypes;
 
 import java.rmi.RemoteException;
 

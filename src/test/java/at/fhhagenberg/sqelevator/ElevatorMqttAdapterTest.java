@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import sqelevator.IElevator;
+import at.fhhagenberg.sqelevator.Adapter.ElevatorMqttAdapter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;

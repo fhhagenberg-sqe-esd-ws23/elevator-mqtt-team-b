@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import at.fhhagenberg.sqelevator.Adapter.datatypes.FloorInfo;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 import sqelevator.IElevator;
 
