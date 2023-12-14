@@ -1,4 +1,4 @@
-package at.fhhagenberg.sqelevator.MqttCallbacks;
+package at.fhhagenberg.sqelevator.Adapter.MqttCallbacks;
 
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttActionListener;

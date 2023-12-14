@@ -1,4 +1,4 @@
-package at.fhhagenberg.sqelevator;
+package at.fhhagenberg.sqelevator.Adapter;
 
 import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
@@ -8,17 +8,17 @@ import org.eclipse.paho.mqttv5.client.persist.MemoryPersistence;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 
-import at.fhhagenberg.sqelevator.datatypes.BuildingInfo;
-import at.fhhagenberg.sqelevator.datatypes.ElevatorInfo;
-import at.fhhagenberg.sqelevator.datatypes.FloorInfo;
-import at.fhhagenberg.sqelevator.datatypes.MqttTopics;
-
 import at.fhhagenberg.sqelevator.exceptions.*;
+import at.fhhagenberg.sqelevator.IElevator;
+import at.fhhagenberg.sqelevator.MqttTopics;
 import at.fhhagenberg.sqelevator.MqttUpdateTimerTask;
-import at.fhhagenberg.sqelevator.MqttCallbacks.CallbackContext;
-import at.fhhagenberg.sqelevator.MqttCallbacks.CommittedDirectionCb;
-import at.fhhagenberg.sqelevator.MqttCallbacks.FloorServicesCb;
-import at.fhhagenberg.sqelevator.MqttCallbacks.TargetFloorCb;
+import at.fhhagenberg.sqelevator.Adapter.MqttCallbacks.CallbackContext;
+import at.fhhagenberg.sqelevator.Adapter.MqttCallbacks.CommittedDirectionCb;
+import at.fhhagenberg.sqelevator.Adapter.MqttCallbacks.FloorServicesCb;
+import at.fhhagenberg.sqelevator.Adapter.MqttCallbacks.TargetFloorCb;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.BuildingInfo;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.ElevatorInfo;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.FloorInfo;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -133,9 +133,9 @@ public class ElevatorMqttAdapter extends TimerTask {
      */
     public void run() {
         // do setup
+        subscribeToController(); // subscribe before connecting to not miss any messages
         connectToBroker();
         readStates();
-        subscribeToController();
         publishRetainedTopics();
 
         // run update loop
@@ -155,9 +155,6 @@ public class ElevatorMqttAdapter extends TimerTask {
      * @throws MqttError
      */
     public void subscribeToController() {
-        if (!client.isConnected()) {
-            throw new MqttError("MQTT client must be connected before subscribing to topics");
-        }
         try {
             for (int id = 0; id < building.getNumberOfElevators(); id++) {
                 // the committed direction control

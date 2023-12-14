@@ -1,8 +1,10 @@
 package at.fhhagenberg.sqelevator.MqttCallbacks;
 
-import at.fhhagenberg.sqelevator.datatypes.BuildingInfo;
-import at.fhhagenberg.sqelevator.datatypes.ElevatorInfo;
 import at.fhhagenberg.sqelevator.IElevator;
+import at.fhhagenberg.sqelevator.Adapter.MqttCallbacks.CallbackContext;
+import at.fhhagenberg.sqelevator.Adapter.MqttCallbacks.FloorServicesCb;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.BuildingInfo;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.ElevatorInfo;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 import at.fhhagenberg.sqelevator.exceptions.InvalidArgError;
 import at.fhhagenberg.sqelevator.exceptions.MqttError;

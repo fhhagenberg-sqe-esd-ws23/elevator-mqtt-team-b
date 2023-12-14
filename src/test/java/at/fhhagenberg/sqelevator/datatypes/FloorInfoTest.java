@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import at.fhhagenberg.sqelevator.IElevator;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.FloorInfo;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 
 /**
