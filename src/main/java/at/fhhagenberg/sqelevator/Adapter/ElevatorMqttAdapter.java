@@ -1,27 +1,32 @@
-package at.fhhagenberg.sqelevator;
+package at.fhhagenberg.sqelevator.Adapter;
 
 import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
+import org.eclipse.paho.mqttv5.client.MqttCallback;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
+import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
 import org.eclipse.paho.mqttv5.client.IMqttToken;
-import org.eclipse.paho.mqttv5.client.MqttActionListener;
 import org.eclipse.paho.mqttv5.client.persist.MemoryPersistence;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
+import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 
-import at.fhhagenberg.sqelevator.datatypes.BuildingInfo;
-import at.fhhagenberg.sqelevator.datatypes.ElevatorInfo;
-import at.fhhagenberg.sqelevator.datatypes.FloorInfo;
-import at.fhhagenberg.sqelevator.datatypes.MqttTopics;
+import sqelevator.IElevator;
 
 import at.fhhagenberg.sqelevator.exceptions.*;
+import at.fhhagenberg.sqelevator.MqttTopics;
 import at.fhhagenberg.sqelevator.MqttUpdateTimerTask;
-import at.fhhagenberg.sqelevator.MqttCallbacks.CallbackContext;
-import at.fhhagenberg.sqelevator.MqttCallbacks.CommittedDirectionCb;
-import at.fhhagenberg.sqelevator.MqttCallbacks.FloorServicesCb;
-import at.fhhagenberg.sqelevator.MqttCallbacks.TargetFloorCb;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.BuildingInfo;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.ElevatorInfo;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.FloorInfo;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+
 
 /**
  * The ElevatorMqttAdapter provides the proprietary plc as MQTT interface <br>
@@ -29,7 +34,7 @@ import java.util.TimerTask;
  * and publishes them via MQTT. <br>
  * It also subscribes to MQTT control topics and forwards the received data directly to the PLC.
  */
-public class ElevatorMqttAdapter extends TimerTask {
+public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
     private MqttAsyncClient client;
     private MemoryPersistence persistence = new MemoryPersistence();
 
@@ -40,27 +45,20 @@ public class ElevatorMqttAdapter extends TimerTask {
 
     private BuildingInfo building;
     private IElevator elevatorIface;
-    private CallbackContext cbContext = new CallbackContext();
-    private MqttActionListener committedDirectionCb = new CommittedDirectionCb();
-    private MqttActionListener floorServicesCb = new FloorServicesCb();
-    private MqttActionListener targetFloorCb = new TargetFloorCb();
     private Timer timer = new Timer();
+    private final long rmiConnectTimeoutS = 10;
 
+    private Pattern digitRegex = Pattern.compile("\\d");
 
-    /**     
-     * @param elevatorIface The PLC control interface
+    /**
      * @param broker host of broker
      * @param clientId id of client
      * @param qos mqtt quality of service
      * @param timeoutMs mqtt timeout in ms
      * @param controlUpdateInterval_ms Update interval in which data is polled from the PLC [ms]
      */
-    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, int qos, long timeoutMs, int controlUpdateInterval_ms) {
+    public ElevatorMqttAdapter(String broker, String clientId, int qos, long timeoutMs, int controlUpdateInterval_ms) {
         this.building = new BuildingInfo();
-        this.elevatorIface = elevatorIface;
-
-        this.cbContext.buildingInfo = this.building;
-        this.cbContext.elevatorIface = this.elevatorIface;
 
         this.qos = qos;
         this.timeoutMs = timeoutMs;
@@ -71,9 +69,24 @@ public class ElevatorMqttAdapter extends TimerTask {
             throw new MqttError(formatMqttException(exc));
         }
     }
-    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, int qos, long timeoutMs) {
-        this(elevatorIface, broker, clientId, qos, timeoutMs, 250);
+    public ElevatorMqttAdapter(String broker, String clientId, int qos, long timeoutMs) {
+        this(broker, clientId, qos, timeoutMs, 250);
     }
+
+    public static void main(String[] args) {
+
+		try {
+            String broker = "tcp://broker.hivemq.com:1883";
+			ElevatorMqttAdapter adapter = new ElevatorMqttAdapter(broker, "elevator_adapter", 0, 10000);
+            adapter.run();
+		} catch (ElevatorError exc) {
+			System.err.println("Caught ElevatorError while running elevator MQTT adapter: " + exc.toString());
+            exc.printStackTrace();
+		} catch (Exception exc) {
+			System.err.println("Caught unhandled exception while running elevator MQTT adapter: " + exc.toString());
+            exc.printStackTrace();
+		}
+	}
 
     /** 
      * Disconnects the MQTT client. 
@@ -98,6 +111,9 @@ public class ElevatorMqttAdapter extends TimerTask {
         try {
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
             connOpts.setCleanStart(false);
+            connOpts.setSessionExpiryInterval(null);
+            connOpts.setAutomaticReconnect(true);
+            connOpts.setKeepAliveInterval(60);
 
             IMqttToken token = client.connect(connOpts);
             token.waitForCompletion(timeoutMs);
@@ -124,8 +140,40 @@ public class ElevatorMqttAdapter extends TimerTask {
             throw new MqttError("While closing connection a " + formatMqttException(exc));
         }        
     }
-    
 
+    /**
+     * Connects to the elevator control via RMI.
+     */
+    public void connectToElevator() {
+        if (!client.isConnected()) {
+            throw new MqttError("MQTT client must be connected before publishing messages");
+        }
+        try {
+            this.elevatorIface = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
+            System.out.println("Successfully connected to elevator RMI interface!");
+
+            // publish connection state
+            try {
+                MqttMessage msg = new MqttMessage(String.valueOf(true).getBytes(), qos, true, null);
+                IMqttToken token = client.publish(MqttTopics.infoTopic + "rmiConnected", msg);
+                token.waitForCompletion(timeoutMs);
+            } catch (MqttException exc) {
+                throw new MqttError("While publishing retained topics a " + formatMqttException(exc));
+            }
+
+
+        } catch(Exception e) {
+            try {
+                System.out.println("Failed to connect to elevator via RMI, retrying in " + String.valueOf(this.rmiConnectTimeoutS) + " seconds");
+                TimeUnit.SECONDS.sleep(this.rmiConnectTimeoutS);
+            } catch(InterruptedException exc) {
+                throw new RmiError("While waiting for reconnect to RMI: " + exc.toString());
+            }
+            // try again
+            connectToElevator();
+        }
+    }
+    
     /**
      * Connects to broker, subscribes to all control topics,  
      * publishes all retained topics and runs the update loop. 
@@ -133,10 +181,15 @@ public class ElevatorMqttAdapter extends TimerTask {
      */
     public void run() {
         // do setup
+        System.out.println("Starting elevator adapter");
         connectToBroker();
+        connectToElevator();
         readStates();
+        client.setCallback((MqttCallback)this);
         subscribeToController();
         publishRetainedTopics();
+
+        System.out.println("Setup done.");
 
         // run update loop
         MqttUpdateTimerTask updateTimerTask = new MqttUpdateTimerTask(() -> { readStates(); publishState(); return null; });
@@ -155,35 +208,17 @@ public class ElevatorMqttAdapter extends TimerTask {
      * @throws MqttError
      */
     public void subscribeToController() {
-        if (!client.isConnected()) {
-            throw new MqttError("MQTT client must be connected before subscribing to topics");
-        }
         try {
             for (int id = 0; id < building.getNumberOfElevators(); id++) {
                 // the committed direction control
-                client.subscribe(
-                    MqttTopics.controlElevatorTopic + String.valueOf(id) + "/committedDirection", 
-                    qos, 
-                    (Object)cbContext, 
-                    committedDirectionCb
-                );
+                client.subscribe(MqttTopics.controlElevatorTopic + String.valueOf(id) + "/committedDirection", qos);
 
                 // the target floor control
-                client.subscribe(
-                    MqttTopics.controlElevatorTopic + String.valueOf(id) + "/targetFloor", 
-                    qos, 
-                    (Object)cbContext, 
-                    targetFloorCb
-                );
+                client.subscribe(MqttTopics.controlElevatorTopic + String.valueOf(id) + "/targetFloor", qos);
 
                 // the floor services control
                 for (int num = 0; num < building.getNumberOfFloors(); num++) {
-                    client.subscribe(
-                        MqttTopics.controlElevatorTopic + String.valueOf(id) + "/floorService/" + String.valueOf(num),
-                        qos, 
-                        (Object)cbContext, 
-                        floorServicesCb
-                    );
+                    client.subscribe(MqttTopics.controlElevatorTopic + String.valueOf(id) + "/floorService/" + String.valueOf(num), qos);
                 }
             }
         } catch (MqttException exc) {
@@ -199,7 +234,7 @@ public class ElevatorMqttAdapter extends TimerTask {
         if (!client.isConnected()) {
             throw new MqttError("MQTT client must be connected before publishing messages");
         }
-        MqttMessage msg = new MqttMessage(null, qos, true, null);
+        MqttMessage msg = new MqttMessage("".getBytes(), qos, true, null);
 
         try {
             // number of elevators
@@ -243,7 +278,7 @@ public class ElevatorMqttAdapter extends TimerTask {
         if (!client.isConnected()) {
             throw new MqttError("MQTT client must be connected before publishing messages");
         }
-        MqttMessage msg = new MqttMessage(null, qos, false, null);
+        MqttMessage msg = new MqttMessage("".getBytes(), qos, false, null);
         try {
             // publish updates for all elevators
             for (int id = 0; id < building.getNumberOfElevators(); id++) {
@@ -329,14 +364,91 @@ public class ElevatorMqttAdapter extends TimerTask {
      * building using the Elevator PLC.
     * */
     public void readStates() {
-        building.populate(elevatorIface);        
+        try {
+            building.populate(elevatorIface);  
+        } catch(ControlError exc) {
+            System.out.println("Lost RMI connection to elevator control, trying to reconnect...");
+
+            // publish connection state
+            try {
+                MqttMessage msg = new MqttMessage(String.valueOf(false).getBytes(), qos, true, null);
+                IMqttToken token = client.publish(MqttTopics.infoTopic + "rmiConnected", msg);
+                token.waitForCompletion(timeoutMs);
+            } catch (MqttException e) {
+                throw new MqttError("While publishing retained topics a " + formatMqttException(e));
+            }
+
+            connectToElevator();
+            // read states again
+            readStates();
+        }            
     }
+
+    /**
+     * Callback function for subscribed MQTT topics.
+     */
+    public void messageArrived(String topic, MqttMessage msg) {
+        try {
+            Matcher matcher = digitRegex.matcher(topic);
+            if (!matcher.find()) {
+                throw new MqttError("Could not find a elevator ID in topic: " + topic);
+            }
+            int elevatorId = Integer.valueOf(matcher.group());
+            int payload = Integer.valueOf(new String(msg.getPayload()));
+
+            if (topic.indexOf("committedDirection") != -1) {
+                // update committed direction and set changed flag
+                building.getElevator(elevatorId).committedDirection = payload;
+                elevatorIface.setCommittedDirection(elevatorId, payload);
+            }
+            else if (topic.indexOf("targetFloor") != -1) {
+                // update target floor and set changed flag
+                building.getElevator(elevatorId).targetFloor = payload;
+                elevatorIface.setTarget(elevatorId, payload);
+            }
+            else {
+                System.out.println("Elevator adapter received unhandled topic: " + topic);
+            }
+        } catch (RemoteException exc) {
+            System.out.println("Lost RMI connection to elevator, trying to reconnect...");
+
+            // publish connection state
+            try {
+                msg = new MqttMessage(String.valueOf(false).getBytes(), qos, true, null);
+                IMqttToken token = client.publish(MqttTopics.infoTopic + "rmiConnected", msg);
+                token.waitForCompletion(timeoutMs);
+            } catch (MqttException e) {
+                throw new MqttError("While publishing retained topics a " + formatMqttException(e));
+            }
+
+            // try to reconnect
+            connectToElevator();
+            // handle MQTT request again
+            messageArrived(topic, msg);
+        }
+    }
+
+    public void connectComplete(boolean reconnect, String serverURI) {
+        System.out.println("MQTT client connected to " + serverURI);
+    }
+
+    public void disconnected(MqttDisconnectResponse disconnectResponse) {
+        System.out.println("MQTT client disconnected");
+    }
+
+    public void mqttErrorOccurred(MqttException exception) {}
+    
+    public void deliveryComplete(IMqttToken token) {}
+    
+    public void authPacketArrived(int reasonCode, MqttProperties properties) {}
+
     private String formatMqttException(MqttException exc) {
         String msg = "MQTT error occurred:\n\treason " + exc.getReasonCode();
         msg += "\tmsg " + exc.getMessage();
         msg += "\tloc " + exc.getLocalizedMessage();
         msg += "\tcause " + exc.getCause();
         msg += "\texcep " + exc;
+        exc.printStackTrace();
         return msg;
     }    
 }

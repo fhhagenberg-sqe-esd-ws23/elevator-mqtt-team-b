@@ -1,9 +1,9 @@
-package at.fhhagenberg.sqelevator.datatypes;
+package at.fhhagenberg.sqelevator.Adapter.datatypes;
 
 import java.rmi.RemoteException;
 
-import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
+import sqelevator.IElevator;
 
 public class ElevatorInfo {  
     public int elevatorId;
@@ -39,7 +39,7 @@ public class ElevatorInfo {
      * @param elevatorControl Instance to the plc
      * @throws ControlError if data could not be read from plc
      */
-    public void populate(at.fhhagenberg.sqelevator.IElevator elevatorControl){
+    public void populate(sqelevator.IElevator elevatorControl){
 
         try{    
             if(!static_context_built){

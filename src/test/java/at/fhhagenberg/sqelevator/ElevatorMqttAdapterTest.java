@@ -9,6 +9,9 @@ import org.eclipse.paho.mqttv5.common.MqttException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import sqelevator.IElevator;
+import at.fhhagenberg.sqelevator.Adapter.ElevatorMqttAdapter;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
