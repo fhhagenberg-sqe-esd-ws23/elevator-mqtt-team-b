@@ -13,7 +13,6 @@ import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 import sqelevator.IElevator;
 
 import at.fhhagenberg.sqelevator.exceptions.*;
-import at.fhhagenberg.sqelevator.exceptions.InternalError;
 import at.fhhagenberg.sqelevator.MqttTopics;
 import at.fhhagenberg.sqelevator.MqttUpdateTimerTask;
 import at.fhhagenberg.sqelevator.Adapter.datatypes.BuildingInfo;
@@ -25,7 +24,6 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.nio.ByteBuffer;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 

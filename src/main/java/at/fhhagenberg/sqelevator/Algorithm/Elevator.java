@@ -2,8 +2,6 @@ package at.fhhagenberg.sqelevator.Algorithm;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.Queue;
 import java.util.LinkedList;
 
@@ -82,7 +80,7 @@ public class Elevator {
                     && (doorStatus == IElevator.ELEVATOR_DOORS_OPEN)) {
                     
                     // target handled -> remove it
-                    primaryTargets.removeFirst(); 
+                    primaryTargets.remove(primaryTargets.first()); 
 
                     // return if primary targets are empty now
                     if (primaryTargets.isEmpty()) {
@@ -109,7 +107,7 @@ public class Elevator {
                     && (doorStatus == IElevator.ELEVATOR_DOORS_OPEN)) {
 
                     // target handled -> remove it
-                    primaryTargets.removeFirst(); 
+                    primaryTargets.remove(primaryTargets.first()); 
 
                     // return if primary targets are empty now
                     if (primaryTargets.isEmpty()) {
@@ -136,7 +134,7 @@ public class Elevator {
                     && (doorStatus == IElevator.ELEVATOR_DOORS_OPEN)) {
 
                     // target handled -> remove it
-                    primaryTargets.removeLast(); 
+                    primaryTargets.remove(primaryTargets.last());
 
                     // return if primary targets are empty now
                     if (primaryTargets.isEmpty()) {
