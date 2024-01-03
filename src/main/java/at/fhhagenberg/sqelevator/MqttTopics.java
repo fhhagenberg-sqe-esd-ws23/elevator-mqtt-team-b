@@ -1,4 +1,4 @@
-package at.fhhagenberg.sqelevator.datatypes;
+package at.fhhagenberg.sqelevator;
 
 public class MqttTopics {
     private static final String topicBase = "building/";

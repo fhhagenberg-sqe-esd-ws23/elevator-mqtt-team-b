@@ -1,8 +1,12 @@
 package at.fhhagenberg.sqelevator.datatypes;
 
-import at.fhhagenberg.sqelevator.IElevator;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.BuildingInfo;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.ElevatorInfo;
+import at.fhhagenberg.sqelevator.Adapter.datatypes.FloorInfo;
 import at.fhhagenberg.sqelevator.exceptions.ControlError;
 import at.fhhagenberg.sqelevator.exceptions.InvalidArgError;
+import sqelevator.IElevator;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;

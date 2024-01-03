@@ -1,9 +1,9 @@
-package at.fhhagenberg.sqelevator.datatypes;
+package at.fhhagenberg.sqelevator.Adapter.datatypes;
 
 import java.rmi.RemoteException;
 
-import at.fhhagenberg.sqelevator.IElevator;
 import at.fhhagenberg.sqelevator.exceptions.*;
+import sqelevator.IElevator;
 
 public class BuildingInfo {
     private ElevatorInfo[] elevators;
