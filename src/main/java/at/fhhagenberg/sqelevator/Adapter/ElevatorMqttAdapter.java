@@ -76,7 +76,7 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
     public static void main(String[] args) {
 
 		try {
-            String broker = "tcp://broker.hivemq.com:1883";
+            String broker = "tcp://localhost:1883";
 			ElevatorMqttAdapter adapter = new ElevatorMqttAdapter(broker, "elevator_adapter", 0, 10000);
             adapter.run();
 		} catch (ElevatorError exc) {
@@ -169,6 +169,15 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
             } catch(InterruptedException exc) {
                 throw new RmiError("While waiting for reconnect to RMI: " + exc.toString());
             }
+            // publish connection state
+            try {
+                MqttMessage msg = new MqttMessage(String.valueOf(true).getBytes(), qos, true, null);
+                IMqttToken token = client.publish(MqttTopics.infoTopic + "rmiConnected", msg);
+                token.waitForCompletion(timeoutMs);
+            } catch (MqttException exc) {
+                throw new MqttError("While publishing retained topics a " + formatMqttException(exc));
+            }
+            
             // try again
             connectToElevator();
         }

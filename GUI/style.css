@@ -1,0 +1,94 @@
+.elevator-container {
+    padding: 20px;
+    display: flex;
+}
+
+.elevator {
+    width: 100%;
+    border: 1px solid #333;
+    position: relative;
+    padding: 10px;
+    margin-right: 20px;
+}
+
+.floor {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    border-top: 1px solid #333; /* Add border between floors */
+    padding-top: 5px; /* Adjust padding for better visual separation */
+    position: relative;
+}
+
+.floor:first-child {
+    border-top: none; /* Remove top border for the first floor */
+}
+
+.elevator-indicator img{
+    /* width: 40%;    
+    background-color: #5096f9;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center; */
+    height:100px;
+}
+
+.floor-label {
+    margin-right: 5px;
+    height:100px;
+}
+
+.button-counter {
+    font-size: 10px;
+    margin-top: 5px;
+}
+
+.arrow-up {
+    border: solid black;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+}
+
+.arrow-down {
+    border: solid black;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}
+
+.circle {
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+}
+
+.elevator-border {
+    border: 1px solid #333;
+    padding: 10px;
+    margin-right: 20px;
+}
+#status{
+    width: 50px;
+    height: 50px;    
+    border-radius: 100%;
+}
+.textBox{
+    display: flex;
+    justify-content: center;
+    height: 25px;;
+}
+.container{
+    padding: 25px;
+    background: lightgray;
+    border-radius: 10px;
+    max-width: 1400px;
+}
