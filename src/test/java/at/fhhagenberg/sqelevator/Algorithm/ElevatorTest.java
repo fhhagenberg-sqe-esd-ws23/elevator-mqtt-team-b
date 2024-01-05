@@ -20,13 +20,14 @@ public class ElevatorTest {
     private static AlgoMqttClient algoMqttClient;
 
     @Container
-    public HiveMQContainer container = new HiveMQContainer(DockerImageName.parse("hivemq/hivemq-ce:latest"));
+    public static HiveMQContainer container = new HiveMQContainer(DockerImageName.parse("hivemq/hivemq-ce:latest"));
 
     @BeforeAll
     public static void setUp() {
+        container.start();
         String broker = "tcp://broker.hivemq.com:1883";
-        algoMqttClient = new AlgoMqttClient(broker, "test", 2, 2000);
-        algoMqttClient.connectToBroker();
+        algoMqttClient = new AlgoMqttClient(broker, "test", 2, 20000);
+        algoMqttClient.connectToBroker();    
     }
 
     @Test
