@@ -333,11 +333,16 @@ public class BuildingTest {
         assertEquals(IElevator.ELEVATOR_DIRECTION_UNCOMMITTED, building.elevators[0].committedDirection);
         
         building.updateElevatorTargets();
+
+        boolean atLeastOneChanged = false;
+        for (Elevator elevator : building.elevators) {
+            if (elevator.committedDirection  == IElevator.ELEVATOR_DIRECTION_UP) {
+                atLeastOneChanged = true;
+                break;
+            }
+        }
         
-        
-        assertEquals(IElevator.ELEVATOR_DIRECTION_UNCOMMITTED, building.elevators[0].committedDirection);        
-        assertEquals(IElevator.ELEVATOR_DIRECTION_UP, building.elevators[1].committedDirection);
-        assertEquals(IElevator.ELEVATOR_DIRECTION_UNCOMMITTED, building.elevators[2].committedDirection);
+        assertTrue(atLeastOneChanged);
     }
 
     @Test

@@ -25,7 +25,7 @@ public class Elevator {
     /** The MQTT client */
     private AlgoMqttClient client;
 
-    private boolean debug = false;
+    public boolean debug = false;
 
 
     public Elevator(int id, int nrOfFloors, int maxNrPassengers, AlgoMqttClient client) {
@@ -71,11 +71,11 @@ public class Elevator {
         if (!primaryTargets.isEmpty()) {
 
             if(debug){
-                System.out.println("ID:" + id + " " + primaryTargets);
+                System.out.println("ID: " + id + " " + primaryTargets);
                 System.out.println("Committed direction: " + id + " " + committedDirection);
                 System.out.println("Current Floor: " + id + " " + currentFloor);
-                System.out.println("Speed:" + id + " " + speed);
-                System.out.println("Doorstatus:" + id + " " + doorStatus);
+                System.out.println("Speed: " + id + " " + speed);
+                System.out.println("Doorstatus: " + id + " " + doorStatus);
             }
 
             // if not driving add target
@@ -117,7 +117,7 @@ public class Elevator {
                     && (doorStatus == IElevator.ELEVATOR_DOORS_OPEN)) {
                     
                     if(debug)
-                        System.out.println("Remove target in dir up:" + primaryTargets.first());
+                        System.out.println("Remove target in dir up: " + primaryTargets.first());
                     // target handled -> remove it
                     primaryTargets.remove(primaryTargets.first());                     
 
@@ -147,7 +147,7 @@ public class Elevator {
                     && (doorStatus == IElevator.ELEVATOR_DOORS_OPEN)) {
 
                     if(debug)
-                        System.out.println("Remove target in dir down:" + primaryTargets.last());                    
+                        System.out.println("Remove target in dir down: " + primaryTargets.last());                    
                     // target handled -> remove it
                     primaryTargets.remove(primaryTargets.last());                    
 
@@ -177,7 +177,7 @@ public class Elevator {
             SortedSet<Integer>targetsOnTheWay = null;
             if (!secondaryTargets.isEmpty()) {
                 SortedSet<Integer> secondaryTargetsSorted = new TreeSet<>(secondaryTargets);
-                if (committedDirection == IElevator.ELEVATOR_DIRECTION_DOWN) {
+                if (committedDirection == IElevator.ELEVATOR_DIRECTION_UP) {
                     targetsOnTheWay = secondaryTargetsSorted.subSet(0, target+1);
                 }
                 else {
@@ -213,7 +213,7 @@ public class Elevator {
         }
         
         if(debug)
-            System.out.println("Publish commited dir:" + committedDirection);
+            System.out.println("Publish commited dir: " + committedDirection);
         client.publishCommittedDirection(id, committedDirection);
     }
 
