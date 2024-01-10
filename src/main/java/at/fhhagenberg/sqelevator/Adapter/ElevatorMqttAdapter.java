@@ -57,7 +57,8 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
      * @param timeoutMs mqtt timeout in ms
      * @param controlUpdateInterval_ms Update interval in which data is polled from the PLC [ms]
      */
-    public ElevatorMqttAdapter(String broker, String clientId, int qos, long timeoutMs, int controlUpdateInterval_ms) {
+    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, int qos, long timeoutMs, int controlUpdateInterval_ms) {
+        this.elevatorIface = elevatorIface;
         this.building = new BuildingInfo();
 
         this.qos = qos;
@@ -69,15 +70,16 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
             throw new MqttError(formatMqttException(exc));
         }
     }
-    public ElevatorMqttAdapter(String broker, String clientId, int qos, long timeoutMs) {
-        this(broker, clientId, qos, timeoutMs, 250);
+    public ElevatorMqttAdapter(IElevator elevatorIface, String broker, String clientId, int qos, long timeoutMs) {
+        this(elevatorIface, broker, clientId, qos, timeoutMs, 250);
     }
 
     public static void main(String[] args) {
 
 		try {
             String broker = "tcp://localhost:1883";
-			ElevatorMqttAdapter adapter = new ElevatorMqttAdapter(broker, "elevator_adapter", 0, 10000);
+            IElevator elevatorIface = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
+			ElevatorMqttAdapter adapter = new ElevatorMqttAdapter(elevatorIface, broker, "elevator_adapter", 0, 10000);
             adapter.run();
 		} catch (ElevatorError exc) {
 			System.err.println("Caught ElevatorError while running elevator MQTT adapter: " + exc.toString());
@@ -144,7 +146,7 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
     /**
      * Connects to the elevator control via RMI.
      */
-    public void connectToElevator() {
+    public void reconnectToElevator() {
         if (!client.isConnected()) {
             throw new MqttError("MQTT client must be connected before publishing messages");
         }
@@ -179,7 +181,7 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
             }
             
             // try again
-            connectToElevator();
+            reconnectToElevator();
         }
     }
     
@@ -192,7 +194,6 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
         // do setup
         System.out.println("Starting elevator adapter");
         connectToBroker();
-        connectToElevator();
         readStates();
         client.setCallback((MqttCallback)this);
         subscribeToController();
@@ -272,6 +273,12 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
                 token = client.publish(MqttTopics.infoElevatorTopic + String.valueOf(id) + "/maxPassengers", msg);
                 token.waitForCompletion(timeoutMs);
             }
+
+            // connection state to RMI 
+            msg.setPayload(String.valueOf(true).getBytes());
+            token = client.publish(MqttTopics.infoTopic + "rmiConnected", msg);
+            token.waitForCompletion(timeoutMs);
+
         } catch (MqttException exc) {
             throw new MqttError("While publishing retained topics a " + formatMqttException(exc));
         }
@@ -387,7 +394,7 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
                 throw new MqttError("While publishing retained topics a " + formatMqttException(e));
             }
 
-            connectToElevator();
+            reconnectToElevator();
             // read states again
             readStates();
         }            
@@ -431,7 +438,7 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
             }
 
             // try to reconnect
-            connectToElevator();
+            reconnectToElevator();
             // handle MQTT request again
             messageArrived(topic, msg);
         }
