@@ -13,6 +13,9 @@ public class Building {
 
     public Elevator[] elevators;
 
+    /** Random generator for random elevator selection */
+    private Random rand = new Random();
+
     public Building(int nrOfElevators, int nrOfFloors, AlgoMqttClient client) {
         if (nrOfElevators <= 0 || nrOfFloors <= 0) {
             throw new InvalidArgError("Number of elevators and number of floors must be a positive integer");
@@ -110,8 +113,7 @@ public class Building {
         }
         // if call was not handled by an yet, randomly select an elevator and add target as secondary since it does not fit to committed direction
         if (!callHandled) {
-            Random rand = new Random();
-            int elevatorId = rand.nextInt(elevators.length);
+            int elevatorId = this.rand.nextInt(elevators.length);
             elevators[elevatorId].addSecondaryTarget(floorId);
         }
     }
