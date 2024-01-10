@@ -177,12 +177,16 @@ public class Elevator {
             SortedSet<Integer>targetsOnTheWay = null;
             if (!secondaryTargets.isEmpty()) {
                 SortedSet<Integer> secondaryTargetsSorted = new TreeSet<>(secondaryTargets);
-                if (committedDirection == IElevator.ELEVATOR_DIRECTION_UP) {
-                    targetsOnTheWay = secondaryTargetsSorted.subSet(0, target+1);
+                if (committedDirection == IElevator.ELEVATOR_DIRECTION_DOWN) {
+                    targetsOnTheWay = secondaryTargetsSorted.subSet(0, currentFloor-1);
                 }
                 else {
-                    targetsOnTheWay = secondaryTargetsSorted.subSet(target, nrOfFloors);
+                    targetsOnTheWay = secondaryTargetsSorted.subSet(currentFloor, nrOfFloors);
                 }
+                // add current target to the targets on the way
+                // might get lost if nearer target exists
+                primaryTargets.add(target);
+                
                 // get subset of targets on the way and add them to primary targets
                 primaryTargets = new TreeSet<Integer>(targetsOnTheWay);
 

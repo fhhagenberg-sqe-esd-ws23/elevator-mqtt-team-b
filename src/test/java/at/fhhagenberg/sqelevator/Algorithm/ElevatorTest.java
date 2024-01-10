@@ -230,7 +230,7 @@ public class ElevatorTest {
         elevator.updateTarget();
 
         // Only for testreport reasons to UNCOMMITTED !!!!! normal _UP
-        assertEquals(IElevator.ELEVATOR_DIRECTION_UNCOMMITTED, elevator.committedDirection);
+        assertEquals(IElevator.ELEVATOR_DIRECTION_UP, elevator.committedDirection);
 
         elevator.currentFloor = 5;
         elevator.updateTarget();
