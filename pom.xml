@@ -3,13 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>at.fhhagenberg.sqelevator</groupId>
-    <artifactId>mqtt-elevator</artifactId>
+    <artifactId>mqtt-elevator-team-b</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <name>MQTT Elevator Team B</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <sonar.organization>fhhagenberg-sqe-esd-ws23</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencyManagement>
