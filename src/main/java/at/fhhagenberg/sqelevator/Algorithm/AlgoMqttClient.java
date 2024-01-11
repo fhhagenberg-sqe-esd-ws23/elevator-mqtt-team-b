@@ -60,7 +60,8 @@ public class AlgoMqttClient implements MqttCallback {
 
      public static void main(String[] args) {
 		try {
-            String broker = "tcp://localhost:1883";
+            String broker_host = (System.getenv("BROKER_HOST") != null) ? System.getenv("BROKER_HOST") : "localhost";
+            String broker = "tcp://" + broker_host + ":1883";
 			AlgoMqttClient adapter = new AlgoMqttClient(broker, "elevator_algorithm", 0, 10000);
             adapter.run();
 		} catch (ElevatorError exc) {
