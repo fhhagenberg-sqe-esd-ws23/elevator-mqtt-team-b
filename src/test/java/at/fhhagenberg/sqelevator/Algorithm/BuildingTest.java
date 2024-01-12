@@ -1,13 +1,11 @@
 package at.fhhagenberg.sqelevator.Algorithm;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.hivemq.HiveMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import com.hivemq.client.internal.mqtt.message.publish.MqttPublish;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5BlockingClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
 
@@ -15,17 +13,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeAll;
 
-import at.fhhagenberg.sqelevator.Algorithm.Building;
-import at.fhhagenberg.sqelevator.Algorithm.Elevator;
 import at.fhhagenberg.sqelevator.exceptions.InvalidArgError;
 import sqelevator.IElevator;
-import at.fhhagenberg.sqelevator.Algorithm.AlgoMqttClient;
 
 @Testcontainers
 public class BuildingTest {
     private Building building;
-    private static AlgoMqttClient algoMqttClient;
-    
+    private static AlgoMqttClient algoMqttClient;   
     private static Mqtt5BlockingClient testClient;
 
     @Container
@@ -42,26 +36,18 @@ public class BuildingTest {
             .serverPort(container.getMqttPort())
             .serverHost(container.getHost())
             .buildBlocking();
-
         testClient.connect();
 
-        
-        testClient.subscribeWith().topicFilter("building/info/elevator/0/maxPassengers").send();
-        testClient.subscribeWith().topicFilter("building/info/elevator/1/maxPassengers").send();
-        testClient.subscribeWith().topicFilter("building/info/elevator/2/maxPassengers").send();
-        
-        byte [] payload = new byte[1];
-        payload[0] = 10;
-        
-        testClient.publishWith().topic("building/info/elevator/0/maxPassengers").payload(payload).send();        
-        testClient.publishWith().topic("building/info/elevator/1/maxPassengers").payload(payload).send();
-        testClient.publishWith().topic("building/info/elevator/2/maxPassengers").payload(payload).send();
+        testClient.publishWith().topic("building/info/elevator/0/maxPassengers").payload(String.valueOf(10).getBytes()).retain(true).send();        
+        testClient.publishWith().topic("building/info/elevator/1/maxPassengers").payload(String.valueOf(10).getBytes()).retain(true).send();
+        testClient.publishWith().topic("building/info/elevator/2/maxPassengers").payload(String.valueOf(10).getBytes()).retain(true).send();
 
-        
+        testClient.publishWith().topic("building/info/numberOfElevators").payload(String.valueOf(3).getBytes()).retain(true).send();
+        testClient.publishWith().topic("building/info/numberOfFloors").payload(String.valueOf(10).getBytes()).retain(true).send();
+        testClient.publishWith().topic("building/info/rmiConnected").payload(String.valueOf(true).getBytes()).retain(true).send();
 
-        String broker = "tcp://broker.hivemq.com:1883";
+        String broker = "tcp://" + container.getHost() + ":" + container.getMqttPort();
         algoMqttClient = new AlgoMqttClient(broker, "test", 2, 2000);
-        algoMqttClient.connectToBroker();
 
         algoMqttClient.run();
         algoMqttClient.stop();

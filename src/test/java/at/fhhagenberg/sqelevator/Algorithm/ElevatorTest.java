@@ -1,6 +1,5 @@
 package at.fhhagenberg.sqelevator.Algorithm;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.hivemq.HiveMQContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -14,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.TreeSet;
 
 import org.junit.jupiter.api.BeforeAll;
 
@@ -29,7 +27,7 @@ public class ElevatorTest {
     @BeforeAll
     public static void setUp() {
         container.start();
-        String broker = "tcp://broker.hivemq.com:1883";
+        String broker = "tcp://" + container.getHost() + ":" + container.getMqttPort();
         algoMqttClient = new AlgoMqttClient(broker, "test", 2, 20000);
         algoMqttClient.connectToBroker();    
     }
@@ -229,7 +227,6 @@ public class ElevatorTest {
         elevator.currentFloor = 4;
         elevator.updateTarget();
 
-        // Only for testreport reasons to UNCOMMITTED !!!!! normal _UP
         assertEquals(IElevator.ELEVATOR_DIRECTION_UP, elevator.committedDirection);
 
         elevator.currentFloor = 5;

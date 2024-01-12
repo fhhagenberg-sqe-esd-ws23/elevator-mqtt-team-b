@@ -185,7 +185,7 @@ public class Elevator {
                 }
                 // add current target to the targets on the way
                 // might get lost if nearer target exists
-                primaryTargets.add(target);
+                targetsOnTheWay.add(target);
                 
                 // get subset of targets on the way and add them to primary targets
                 primaryTargets = new TreeSet<Integer>(targetsOnTheWay);

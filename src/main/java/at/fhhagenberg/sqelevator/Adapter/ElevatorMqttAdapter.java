@@ -44,7 +44,7 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
     private int controlUpdateInterval_ms;    
 
     private BuildingInfo building;
-    public IElevator elevatorIface;
+    private IElevator elevatorIface;
     private Timer timer = new Timer();
     private final long rmiConnectTimeoutS = 10;
 

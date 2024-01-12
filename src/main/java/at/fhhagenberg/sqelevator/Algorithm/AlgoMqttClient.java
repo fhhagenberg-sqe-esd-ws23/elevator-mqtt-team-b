@@ -54,7 +54,7 @@ public class AlgoMqttClient implements MqttCallback {
         }
     }
 
-    AlgoMqttClient(String broker, String clientId, int qos, long timeoutMs) {
+    public AlgoMqttClient(String broker, String clientId, int qos, long timeoutMs) {
         this(broker, clientId, qos, timeoutMs, 250);
     }
 
