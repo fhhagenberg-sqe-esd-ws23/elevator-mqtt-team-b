@@ -315,12 +315,7 @@ public class ElevatorTest {
 
         elevator.updateTarget();
 
-        String TestStr = """
-                ID: 1 [5]\r
-                Committed direction: 1 2\r
-                Current Floor: 1 0\r
-                Speed: 1 0\r
-                Doorstatus: 1 2""";
+        String TestStr = "ID: 1 [5]\r\nCommitted direction: 1 2\r\nCurrent Floor: 1 0\r\nSpeed: 1 0\r\nDoorstatus: 1 2";
 
         assertEquals(TestStr, outputStreamCaptor.toString().trim());
 
@@ -383,14 +378,7 @@ public class ElevatorTest {
         assertEquals(IElevator.ELEVATOR_DIRECTION_UNCOMMITTED, elevator.committedDirection);
 
 
-        String TestStr = """
-                ID: 1 [5]\r
-                Committed direction: 1 0\r
-                Current Floor: 1 5\r
-                Speed: 1 0\r
-                Doorstatus: 1 1\r
-                Remove target in dir up: 5\r
-                Publish commited dir: 2""";
+        String TestStr = "ID: 1 [5]\r\nCommitted direction: 1 0\r\nCurrent Floor: 1 5\r\nSpeed: 1 0\r\nDoorstatus: 1 1\r\nRemove target in dir up: 5\r\nPublish commited dir: 2";
 
         assertEquals(TestStr, outputStreamCaptor.toString().trim());
 
@@ -459,14 +447,7 @@ public class ElevatorTest {
         assertEquals(IElevator.ELEVATOR_DIRECTION_UNCOMMITTED, elevator.committedDirection);
 
 
-        String TestStr = """
-                ID: 1 [2]\r
-                Committed direction: 1 1\r
-                Current Floor: 1 2\r
-                Speed: 1 0\r
-                Doorstatus: 1 1\r
-                Remove target in dir down: 2\r
-                Publish commited dir: 2""";
+        String TestStr = "ID: 1 [2]\r\nCommitted direction: 1 1\r\nCurrent Floor: 1 2\r\nSpeed: 1 0\r\nDoorstatus: 1 1\r\nRemove target in dir down: 2\r\nPublish commited dir: 2";
 
         assertEquals(TestStr, outputStreamCaptor.toString().trim());
 
