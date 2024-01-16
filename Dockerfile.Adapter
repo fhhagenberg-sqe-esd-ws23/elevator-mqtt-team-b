@@ -1,0 +1,7 @@
+FROM maven:3.9.6-eclipse-temurin-21-jammy AS build
+COPY src /app/src  
+COPY pom.xml /app/
+RUN mvn -f /app/pom.xml clean package
+RUN cp /app/target/*with-dependencies.jar /app/adapter.jar
+EXPOSE 1099
+CMD ["java","-cp", "/app/adapter.jar", "at.fhhagenberg.sqelevator.Adapter.ElevatorMqttAdapter"]

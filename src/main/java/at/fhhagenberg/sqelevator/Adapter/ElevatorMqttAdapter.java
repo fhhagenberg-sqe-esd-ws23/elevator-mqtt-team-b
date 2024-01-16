@@ -77,8 +77,12 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
     public static void main(String[] args) {
 
 		try {
-            String broker = "tcp://localhost:1883";
-            IElevator elevatorIface = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
+            // get correct hosts
+            String rmi_host = (System.getenv("RMI_HOST") != null) ? System.getenv("RMI_HOST") : "localhost";
+            String broker_host = (System.getenv("BROKER_HOST") != null) ? System.getenv("BROKER_HOST") : "localhost";
+            String broker = "tcp://" + broker_host + ":1883";
+
+            IElevator elevatorIface = (IElevator) Naming.lookup("rmi://" + rmi_host + "/ElevatorSim");            
 			ElevatorMqttAdapter adapter = new ElevatorMqttAdapter(elevatorIface, broker, "elevator_adapter", 0, 10000);
             adapter.run();
 		} catch (ElevatorError exc) {
@@ -151,7 +155,10 @@ public class ElevatorMqttAdapter extends TimerTask implements MqttCallback {
             throw new MqttError("MQTT client must be connected before publishing messages");
         }
         try {
-            this.elevatorIface = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
+            // get correct rmi host
+            String rmi_host = (System.getenv("RMI_HOST") != null) ? System.getenv("RMI_HOST") : "localhost";
+
+            this.elevatorIface = (IElevator) Naming.lookup("rmi://" + rmi_host + "/ElevatorSim");
             System.out.println("Successfully connected to elevator RMI interface!");
 
             // publish connection state

@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  broker: 
+    extends:
+      file: ./broker/docker-compose.yml
+      service: mqtt5
+  algo:
+    build:
+      context: ./
+      dockerfile: Dockerfile.Algo
+    depends_on:
+      - broker
+    environment:      
+      - BROKER_HOST=broker    
+  adapter: 
+    build:
+      context: ./
+      dockerfile: Dockerfile.Adapter
+    depends_on:
+      - broker
+    environment:
+      - RMI_HOST=host.docker.internal
+      - BROKER_HOST=broker    
+  gui: 
+    build: ./gui
+    depends_on:
+      - broker
+    ports:
+      - "80:8000"
