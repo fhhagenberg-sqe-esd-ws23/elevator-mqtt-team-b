@@ -21,7 +21,51 @@ The GUI should now be available under `http://localhost`
 ![](docu/ClassDiagram/Adapter.svg)
 ## Elevator Algorithm
 ![](docu/ClassDiagram/Algorithm.svg)
-## Testing Techniques
+
+## Product Quality 
+- **Automated Tests** as shown done with every push and merge by **GitHub Action**
+- **Static Code Analysis** done with every push and merge by **SonarCloud**
+- **Code** done individually was **reviewed by** at least one **colleague** with GitHub Pull Request
+- Issue Management was done by talking with colleague, which then was solved and with a GitHub Pull Request merged into Master
+
+### Automated Testing
+
+The Tests were mostly done as White Box Tests, where the main focus was on Branchcoverage due to functionality. The overall result is as shown: 
+
+![Testprotocol](/docu/JacocoTestprotocol.png)
+
+After running the automated testcases, the jacoco testprotocol with the results will be placed at: 
+[Jacoco-Testprotocol](/target/site/jacoco/index.html)
+
+### Elevator Adapter Testing
+
+- Automated tests are done in a Docker Container
+- HiveMQ Docker Container as MQTT Broker
+- Testing focuses on branches due the logic
+- Coverage is low due to avoiding RMI connection in testing
+
+![Adapter](/docu/JacocoTestprotocol_ElevatorAdapter.png)
+
+### Datatypes for Elevator Adapter 
+- Simple Unit testing with Focus on functionality
+
+![Datatypes](/docu/JacocoTestprotocol_Datatypes.png)
+ 
+### Elevator Algorithm Testing
+
+- Automated tests are done in a Docker Container
+- HiveMQ Docker Container as MQTT Broker
+- Testing focuses on branches due the logic
+
+![Algorithm](/docu/JacocoTestprotocol_ElevatorAlgorithm.png)
+
+### Simple Statemachine for Elevator
+The help with creation of the testcases for the Elevator and Building class this simple statemachine was used.
+
+![Elevator](/docu/Statemachine_Elevator.png)
+
+
+
 ## GUI
 ![](docu/GUI.png)
 
@@ -79,4 +123,6 @@ The documentation can be found under `target/site/apidocs`
 ## MQTT Broker
 1. Install docker
 2. docker run -it -p 1883:1883 -p 9001:9001  eclipse-mosquitto:latest
+
+
 
