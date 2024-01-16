@@ -31,7 +31,6 @@ public class IntegrationTest {
     @Container
     public static HiveMQContainer container = new HiveMQContainer(DockerImageName.parse("hivemq/hivemq-ce:latest"));
 
-    private static Mqtt5BlockingClient testClientStart;
     private AlgoMqttClient algoMqttClient;
     private ElevatorMqttAdapter elevatorMqttAdapter;
 
@@ -43,13 +42,6 @@ public class IntegrationTest {
     @BeforeAll
     public static void setUp() {
         container.start();
-
-        // testClientStart = Mqtt5Client.builder()
-        //     .identifier("testClientStart")
-        //     .serverPort(container.getMqttPort())
-        //     .serverHost(container.getHost())
-        //     .buildBlocking();
-        // testClientStart.connect();
     }
 
     @Test
@@ -57,7 +49,6 @@ public class IntegrationTest {
 
         MockitoAnnotations.initMocks(this);
 
-        //String broker = "tcp://broker.hivemq.com:1883";
         elevatorMqttAdapter = new ElevatorMqttAdapter(elevatorMock ,broker, "testadapt", 1, 5000);
         algoMqttClient      = new AlgoMqttClient(broker, "testalgo", 1, 5000);
 
@@ -76,10 +67,8 @@ public class IntegrationTest {
         when(elevatorMock.getFloorHeight()).thenReturn(3);
 
 
-            elevatorMqttAdapter.run();
-
-            algoMqttClient.run();
-
+        elevatorMqttAdapter.run();
+        algoMqttClient.run();
         
         try {
             Thread.sleep(3000);
@@ -94,54 +83,4 @@ public class IntegrationTest {
 
         assertEquals(5, algoMqttClient.getMaxPassengers(0));
     }
-
-//     @Test
-//     public void testRunAlgoAndAdapter2() throws RemoteException {
-
-//         MockitoAnnotations.initMocks(this);
-
-//         elevatorMqttAdapter = new ElevatorMqttAdapter(elevatorMock ,broker, "test", 1, 5000);
-//         algoMqttClient      = new AlgoMqttClient(broker, "test", 1, 5000);
-
-//         when(elevatorMock.getElevatorNum()).thenReturn(1);
-//         when(elevatorMock.getElevatorFloor(0)).thenReturn(0);
-//         when(elevatorMock.getElevatorAccel(0)).thenReturn(15);
-//         when(elevatorMock.getElevatorDoorStatus(0)).thenReturn(2);
-//         when(elevatorMock.getElevatorPosition(0)).thenReturn(0);
-//         when(elevatorMock.getElevatorSpeed(0)).thenReturn(5);
-//         when(elevatorMock.getElevatorWeight(0)).thenReturn(10);
-//         when(elevatorMock.getElevatorCapacity(0)).thenReturn(5);
-
-//         when(elevatorMock.getFloorNum()).thenReturn(2);
-//         when(elevatorMock.getElevatorButton(0, 0)).thenReturn(false);
-//         when(elevatorMock.getElevatorButton(0, 1)).thenReturn(true);
-//         when(elevatorMock.getFloorButtonDown(0)).thenReturn(true);
-//         when(elevatorMock.getFloorButtonUp(0)).thenReturn(false);
-//         when(elevatorMock.getFloorButtonDown(1)).thenReturn(true);
-//         when(elevatorMock.getFloorButtonUp(1)).thenReturn(false);
-        
-//         when(elevatorMock.getFloorHeight()).thenReturn(3);
-//         when(elevatorMock.getServicesFloors(0, 0)).thenReturn(true);
-//         when(elevatorMock.getServicesFloors(0, 1)).thenReturn(true);
-
-//         when(elevatorMock.getTarget(0)).thenReturn(1);
-//         when(elevatorMock.getClockTick()).thenReturn(1000L);
-//         when(elevatorMock.getCommittedDirection(0)).thenReturn(1);  
-
-//         elevatorMqttAdapter.run();
-//         algoMqttClient.run();
-
-//         testClientStart.publishWith().topic("building/info/elevator/0/maxPassengers").payload(String.valueOf(10).getBytes()).retain(true).send();
-        
-//         try {
-//             Thread.sleep(500);
-//         } catch (InterruptedException e) {
-//             e.printStackTrace();
-//         }
-
-//         algoMqttClient.stop();
-//         elevatorMqttAdapter.stop();  
-
-//         assertEquals(10, algoMqttClient.getMaxPassengers(0));
-//     }
 }
