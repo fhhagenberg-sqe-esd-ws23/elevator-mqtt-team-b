@@ -47,3 +47,16 @@ The documentation can be found under `target/site/apidocs`
 1. Install docker
 2. docker run -it -p 1883:1883 -p 9001:9001  eclipse-mosquitto:latest
 
+
+## Testing
+The Tests were mostly done as White Box Tests, where the focus was on Line and Branchcoverage. 
+
+### Link to Jacoco-Testprotocol
+After running the automated testcases, the jacoco testprotocol with the results will be placed at: 
+[Jacoco-Testprotocol](./target/site/jacoco/index.html)
+
+### Elevator
+The exception was the Elevator class, where a simple model was used to create testcases.
+
+![Elevator](./docu/Statemachine_Elevator.png)
+
