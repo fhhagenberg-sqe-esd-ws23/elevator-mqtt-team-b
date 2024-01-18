@@ -64,7 +64,13 @@ The help with creation of the testcases for the Elevator and Building class this
 
 ![Elevator](/docu/Statemachine_Elevator.png)
 
+### Manual Tests
 
+Reconnect to PLC 
+  - Starting Elevator Simulator
+  - Starting Algo and Adapter
+  - Killing and restarting Elevator Simulator
+  - Check in GUI if the elevator system reconnects
 
 ## GUI
 ![](docu/GUI.png)
